@@ -15,23 +15,27 @@
 ## 🎯 Features
 
 ### 🧠 **ML-Powered Predictions**
+
 - **99.94% accuracy** Random Forest model
 - Real-time health score calculation
 - Predictive maintenance alerts
 - Status classification (Excellent, Normal, Advisory, Warning, Critical)
 
 ### 📊 **Multi-Platform**
+
 - **Website Dashboard** - React-based real-time monitoring
 - **Mobile Application** - React Native (Expo) for iOS & Android
 - **Raspberry Pi Backend** - Python Flask API with OBD-II integration
 
 ### 🔌 **OBD-II Integration**
+
 - 30+ sensor data points
 - Live data streaming (1-second polling)
 - Historical data logging
 - Diagnostic Trouble Codes (DTC) monitoring
 
 ### 📱 **Cross-Platform Synchronization**
+
 - Same data, same features across web and mobile
 - Consistent UI/UX design
 - Real-time updates
@@ -129,6 +133,7 @@ npx expo start
 ## 📊 Sensor Data Monitored
 
 ### **Engine Metrics**
+
 - RPM (Revolutions Per Minute)
 - Engine Load
 - Coolant Temperature
@@ -139,6 +144,7 @@ npx expo start
 - MAP (Manifold Absolute Pressure)
 
 ### **Fuel System**
+
 - Fuel System Status
 - Fuel Pressure
 - Fuel Level
@@ -147,12 +153,14 @@ npx expo start
 - Long-term Fuel Trim
 
 ### **Emissions**
+
 - O₂ Sensor Voltages (Bank 1, Sensor 1 & 2)
 - Catalyst Temperature
 - EGR Error Rate
 - Barometric Pressure
 
 ### **Other**
+
 - Vehicle Speed
 - Control Module Voltage
 - Engine Runtime
@@ -166,9 +174,10 @@ npx expo start
 **Algorithm:** Random Forest Classifier  
 **Accuracy:** 99.94%  
 **Features:** 30+ sensor inputs  
-**Output:** Health Score (0-100) + Status Classification  
+**Output:** Health Score (0-100) + Status Classification
 
 **Training Data:**
+
 - Real-world OBD-II sensor readings
 - Multiple vehicle conditions
 - Various maintenance scenarios
@@ -180,15 +189,18 @@ npx expo start
 ## 🌐 Deployment
 
 ### **Website (Vercel)**
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/AdrianG-26/autopulse-vehicle-diagnostic)
 
 See `website/DEPLOYMENT.md` for detailed instructions.
 
 ### **Mobile App**
+
 - Build APK with Expo EAS Build
 - Or publish to Google Play Store / Apple App Store
 
 ### **Raspberry Pi API**
+
 - Run locally on Raspberry Pi
 - Expose via Cloudflare Tunnel or ngrok for remote access
 
@@ -208,23 +220,27 @@ See `website/DEPLOYMENT.md` for detailed instructions.
 ## 🛠️ Technology Stack
 
 ### **Frontend**
+
 - React 19.1.1
 - React Native (Expo)
 - TypeScript
 - Tailwind-inspired styling
 
 ### **Backend**
+
 - Python 3.x
 - Flask (REST API)
 - SQLite (data storage)
 - python-obd (OBD-II communication)
 
 ### **Machine Learning**
+
 - scikit-learn
 - Random Forest
 - joblib (model persistence)
 
 ### **Deployment**
+
 - Vercel (website hosting)
 - Expo (mobile app distribution)
 - Cloudflare Tunnel (API exposure)
@@ -234,17 +250,20 @@ See `website/DEPLOYMENT.md` for detailed instructions.
 ## 🔧 System Requirements
 
 ### **Raspberry Pi**
+
 - Raspberry Pi 3/4/5
 - Raspbian OS
 - Python 3.7+
 - OBD-II USB/Bluetooth adapter
 
 ### **Development**
+
 - Node.js 18+
 - npm or yarn
 - Git
 
 ### **Mobile Testing**
+
 - Expo Go app (iOS/Android)
 - Or Android Studio / Xcode for building
 
@@ -275,6 +294,7 @@ GitHub: [@AdrianG-26](https://github.com/AdrianG-26)
 ## 📞 Support
 
 For questions or issues:
+
 1. Open a GitHub Issue
 2. Check the documentation in `/docs`
 3. Review deployment guides in `/website`
