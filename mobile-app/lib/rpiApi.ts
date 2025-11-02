@@ -3,8 +3,14 @@
  * Connects to Flask API running on Raspberry Pi
  */
 
-// Default to localhost for development, can be configured in app settings
+// Default to a common Pi IP for local hotspots; can be configured in app settings
 const DEFAULT_API_URL = "http://192.168.1.100:5000"; // Change this to your Raspberry Pi IP
+
+// Persisted setting key
+const STORAGE_KEY_API_URL = "@autopulse:rpi_api_url";
+
+// AsyncStorage is used to persist the API URL so the app can switch endpoints at runtime
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface VehicleData {
   timestamp: string;
@@ -65,6 +71,23 @@ class RaspberryPiAPI {
   }
 
   /**
+   * Initialize from persisted storage (call on app start)
+   */
+  async init(): Promise<void> {
+    try {
+      const saved = await AsyncStorage.getItem(STORAGE_KEY_API_URL);
+      if (saved) {
+        this.apiUrl = saved;
+        console.log("Loaded saved Raspberry Pi API URL:", saved);
+      } else {
+        console.log("No saved API URL, using default:", this.apiUrl);
+      }
+    } catch (e) {
+      console.warn("Failed to load saved API URL, using default", e);
+    }
+  }
+
+  /**
    * Get API URL
    */
   getApiUrl(): string {
@@ -76,6 +99,19 @@ class RaspberryPiAPI {
    */
   setApiUrl(url: string): void {
     this.apiUrl = url;
+  }
+
+  /**
+   * Set and persist API URL
+   */
+  async setAndPersistApiUrl(url: string): Promise<void> {
+    this.apiUrl = url;
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY_API_URL, url);
+      console.log("Persisted Raspberry Pi API URL:", url);
+    } catch (e) {
+      console.warn("Failed to persist API URL", e);
+    }
   }
 
   /**
@@ -221,6 +257,15 @@ class RaspberryPiAPI {
 
 // Export singleton instance
 export const rpiApi = new RaspberryPiAPI();
+
+// Attempt to load persisted API URL on import (non-blocking)
+(async () => {
+  try {
+    await rpiApi.init();
+  } catch (e) {
+    console.warn("rpiApi.init() failed:", e);
+  }
+})();
 
 // Export types
 export type { ApiResponse, VehicleData };
