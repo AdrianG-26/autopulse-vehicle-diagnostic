@@ -31,10 +31,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "REACT_APP_SUPABASE_URL": "@autopulse-supabase-url",
-    "REACT_APP_SUPABASE_ANON_KEY": "@autopulse-supabase-key",
-    "REACT_APP_API_URL": "@autopulse-api-url"
-  }
+  ]
 }
