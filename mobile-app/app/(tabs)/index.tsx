@@ -553,22 +553,22 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E9F1F6",
+    backgroundColor: "#fafafa", // Material background
   },
   header: {
-    padding: 20,
-    paddingTop: 20,
+    padding: 16,
+    paddingTop: 16,
     alignItems: "center",
-    backgroundColor: "#E9F1F6",
+    backgroundColor: "#fafafa",
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 60,
-    paddingBottom: 10,
-    backgroundColor: "#E9F1F6",
+    paddingBottom: 12,
+    backgroundColor: "#fafafa",
   },
   brandRow: {
     flexDirection: "row",
@@ -577,85 +577,93 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 20,
-    fontWeight: "800",
-    color: "#16445A",
+    fontWeight: "500", // Material medium weight
+    color: "#1c1b1f",
+    letterSpacing: 0.15,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: "800",
+    fontSize: 28, // Material headline medium
+    fontWeight: "400",
     marginBottom: 8,
-    color: "#16445A",
+    color: "#1c1b1f",
+    letterSpacing: 0,
   },
   headerSubtitle: {
     fontSize: 16,
-    color: "#6b7d86",
+    color: "#49454f",
+    fontWeight: "400",
+    letterSpacing: 0.5,
   },
   panelContainer: {
-    padding: 20,
-    backgroundColor: "#E9F1F6",
+    padding: 16,
+    backgroundColor: "#fafafa",
   },
   panelTitle: {
-    fontSize: 20,
-    fontWeight: "800",
+    fontSize: 22, // Material title large
+    fontWeight: "500",
     marginBottom: 12,
-    color: "#123B4A",
+    color: "#1c1b1f",
+    letterSpacing: 0,
   },
   panelCard: {
     padding: 16,
     borderRadius: 12,
     backgroundColor: "#ffffff",
+    elevation: 1, // Material elevation level 1
     shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#E6E9ED",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.18,
+    shadowRadius: 1.0,
   },
   panelRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 8,
+    paddingVertical: 12,
+    minHeight: 48, // Material minimum touch target
   },
   panelRowLeft: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 12,
   },
   panelRowLabel: {
     fontSize: 16,
-    color: "#123B4A",
-    fontWeight: "600",
+    color: "#1c1b1f",
+    fontWeight: "500",
+    letterSpacing: 0.15,
   },
   panelDivider: {
     height: 1,
-    backgroundColor: "#E6E9ED",
-    marginVertical: 8,
+    backgroundColor: "#e0e0e0", // Material outline
+    marginVertical: 4,
   },
   healthScore: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#123B4A",
+    fontSize: 24,
+    fontWeight: "400", // Material uses regular for numbers
+    color: "#1c1b1f",
   },
   pendingText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#6b7d86",
+    fontWeight: "400",
+    color: "#49454f",
     fontStyle: "italic",
+    letterSpacing: 0.25,
   },
   badge: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 8, // Material uses smaller radius for chips
     borderWidth: 1,
   },
   badgeText: {
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "500",
     textTransform: "capitalize",
+    letterSpacing: 0.5,
   },
   troubleCodesSection: {
-    paddingTop: 4,
+    paddingTop: 8,
   },
   troubleCodesHeader: {
     flexDirection: "row",
@@ -665,19 +673,24 @@ const styles = StyleSheet.create({
   },
   troubleCodesTitle: {
     fontSize: 16,
-    fontWeight: "700",
-    color: "#123B4A",
+    fontWeight: "500",
+    color: "#1c1b1f",
+    letterSpacing: 0.15,
   },
   troubleCodesEmpty: {
     fontSize: 14,
-    color: "#6b7d86",
+    color: "#49454f",
+    fontWeight: "400",
+    letterSpacing: 0.25,
   },
   troubleCodesList: {
     gap: 8,
   },
   alertText: {
-    fontSize: 13,
-    color: "#123B4A",
+    fontSize: 14,
+    color: "#1c1b1f",
     lineHeight: 20,
+    fontWeight: "400",
+    letterSpacing: 0.25,
   },
 });

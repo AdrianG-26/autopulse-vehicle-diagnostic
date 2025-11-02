@@ -182,7 +182,7 @@ function MetricTile({
   );
 }
 
-const BG = "#E9F1F6";
+const BG = "#fafafa"; // Material background
 const CARD = "#ffffff";
 
 const styles = StyleSheet.create({
@@ -206,8 +206,9 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 20,
-    fontWeight: "800",
-    color: "#16445A",
+    fontWeight: "500",
+    color: "#1c1b1f",
+    letterSpacing: 0.15,
   },
   titleRow: {
     flexDirection: "row",
@@ -216,26 +217,31 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#123B4A",
+    fontSize: 22,
+    fontWeight: "500",
+    color: "#1c1b1f",
+    letterSpacing: 0,
   },
   subtitle: {
-    color: "#6b7d86",
+    color: "#49454f",
+    fontSize: 14,
+    fontWeight: "400",
+    letterSpacing: 0.25,
   },
   card: {
     backgroundColor: CARD,
-    borderRadius: 14,
+    borderRadius: 12,
     padding: 12,
+    elevation: 1,
     shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.18,
+    shadowRadius: 1.0,
     gap: 12,
   },
   metricRow: {
     flexDirection: "row",
-    gap: 10,
+    gap: 12,
   },
   tile: {
     flex: 1,
@@ -244,9 +250,9 @@ const styles = StyleSheet.create({
     gap: 10,
     backgroundColor: "#ffffff",
     borderRadius: 12,
-    padding: 10,
+    padding: 12,
     borderWidth: 1,
-    borderColor: "#E6E9ED",
+    borderColor: "#e0e0e0",
   },
   tileIcon: {
     width: 32,
@@ -261,15 +267,16 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   tileLabel: {
-    color: "#637783",
+    color: "#49454f",
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "500",
     flexWrap: "wrap",
+    letterSpacing: 0.5,
   },
   tileValue: {
-    color: "#123B4A",
-    fontSize: 14,
-    fontWeight: "800",
+    color: "#1c1b1f",
+    fontSize: 16,
+    fontWeight: "400",
     flexWrap: "wrap",
   },
   secondaryButton: {
@@ -279,20 +286,26 @@ const styles = StyleSheet.create({
     gap: 8,
     backgroundColor: "transparent",
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 10,
+    paddingVertical: 12,
+    borderRadius: 12,
     alignSelf: "stretch",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#C9D3DA",
+    borderColor: "#e0e0e0",
+    minHeight: 48,
   },
   secondaryButtonText: {
-    color: "#123B4A",
-    fontWeight: "800",
+    color: "#1c1b1f",
+    fontWeight: "500",
+    fontSize: 14,
+    letterSpacing: 0.1,
   },
   footer: {
     textAlign: "center",
-    color: "#6b7d86",
+    color: "#49454f",
     marginTop: 16,
+    fontSize: 12,
+    fontWeight: "400",
+    letterSpacing: 0.4,
   },
 });
