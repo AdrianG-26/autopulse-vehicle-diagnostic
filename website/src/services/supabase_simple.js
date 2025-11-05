@@ -130,8 +130,3 @@ export async function changeUserPassword(userId, newPassword) {
 }
 
 export default supabase;
-
-// ================================================================
-// HELPER FUNCTIONS
-// ================================================================
-export const isSupabaseConfigured = () => Boolean(supabaseUrl && supabaseAnonKey);

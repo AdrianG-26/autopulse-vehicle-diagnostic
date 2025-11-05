@@ -36,7 +36,7 @@ EXPORTS_DIR = BASE_DIR / "src" / "exports"
 STATIC_DIR = BASE_DIR / "web" / "static"
 TEMPLATES_DIR = BASE_DIR / "web" / "templates"
 MODELS_DIR = BASE_DIR / "src" / "models"
-DB_PATH = BASE_DIR / "src" / "data" / "vehicle_data.db"
+DB_PATH = BASE_DIR / "data" / "vehicle_data.db"
 
 # Create Flask app with explicit template and static folders
 app = Flask(__name__, 

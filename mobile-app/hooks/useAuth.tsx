@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 type AuthUser = {
   id: string;
   email: string | null;
+  username: string | null;
 };
 
 type Vehicle = {
@@ -20,8 +21,8 @@ type AuthContextValue = {
   user: AuthUser | null;
   vehicles: Vehicle[];
   currentVehicle: Vehicle | null;
-  signIn: (identifier: string, password: string) => Promise<void>;
-  signUp: (identifier: string, password: string) => Promise<{ requiresEmailConfirmation: boolean }>;
+  signIn: (usernameOrEmail: string, password: string) => Promise<void>;
+  signUp: (username: string, email: string, password: string) => Promise<{ requiresEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
   setCurrentVehicle: (vehicle: Vehicle | null) => void;
   refreshVehicles: () => Promise<void>;
@@ -35,40 +36,117 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [currentVehicle, setCurrentVehicle] = useState<Vehicle | null>(null);
 
-  const signIn = async (identifier: string, password: string) => {
-    const idProvided = Boolean(identifier && identifier.trim().length > 0);
-    const passwordProvided = Boolean(password && password.trim().length > 0);
+  // ================================================================
+  // SIMPLE LOGIN - Username OR Email + Password
+  // ================================================================
+  const signIn = async (usernameOrEmail: string, password: string) => {
+    console.log('🔐 Mobile login:', { usernameOrEmail });
 
-    if (!idProvided) {
-      throw new Error('Email is required');
+    if (!usernameOrEmail || !usernameOrEmail.trim()) {
+      throw new Error('Username or email is required');
     }
 
-    if (!passwordProvided) {
-      throw new Error('Password is required');
-    }
-
-    if (password.length < 6) {
+    if (!password || password.trim().length < 6) {
       throw new Error('Password must be at least 6 characters');
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: identifier.trim(),
-      password,
-    });
+    try {
+      // Check if it's an email or username
+      const isEmail = usernameOrEmail.includes('@');
+      
+      // Query the users table
+      const { data: users, error } = await supabase
+        .from('users')
+        .select('*')
+        .or(isEmail ? `email.eq.${usernameOrEmail}` : `username.eq.${usernameOrEmail}`)
+        .limit(1);
 
-    if (error) {
-      throw new Error(error.message);
+      if (error) {
+        console.error('❌ Query error:', error);
+        throw new Error('Login failed');
+      }
+
+      if (!users || users.length === 0) {
+        console.log('❌ User not found');
+        throw new Error('User not found');
+      }
+
+      const foundUser = users[0];
+
+      // Check password (plain text comparison)
+      if (foundUser.password !== password) {
+        console.log('❌ Wrong password');
+        throw new Error('Invalid password');
+      }
+
+      console.log('✅ Login successful:', foundUser);
+      setUser({
+        id: foundUser.id,
+        email: foundUser.email,
+        username: foundUser.username
+      });
+      setIsAuthenticated(true);
+    } catch (error: any) {
+      console.error('❌ Login failed:', error);
+      throw error;
+    }
+  };
+
+  // ================================================================
+  // SIMPLE SIGNUP - Username, Email, Password
+  // ================================================================
+  const signUp = async (username: string, email: string, password: string) => {
+    console.log('🔐 Mobile signup:', { username, email });
+
+    if (!username || !username.trim()) {
+      throw new Error('Username is required');
     }
 
-    const sUser = data.user;
-    if (sUser) {
-      setUser({ id: sUser.id, email: sUser.email });
+    if (!email || !email.trim()) {
+      throw new Error('Email is required');
+    }
+
+    if (!password || password.length < 6) {
+      throw new Error('Password must be at least 6 characters');
+    }
+
+    try {
+      // Just insert directly into users table
+      const { data, error } = await supabase
+        .from('users')
+        .insert([
+          {
+            username: username.trim(),
+            email: email.trim(),
+            password  // Stored as plain text
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Signup error:', error);
+        if (error.message.includes('duplicate') || error.code === '23505') {
+          throw new Error('Username or email already exists');
+        }
+        throw new Error('Signup failed');
+      }
+
+      console.log('✅ User created:', data);
+      setUser({
+        id: data.id,
+        email: data.email,
+        username: data.username
+      });
       setIsAuthenticated(true);
+      return { requiresEmailConfirmation: false };
+    } catch (error: any) {
+      console.error('❌ Signup failed:', error);
+      throw error;
     }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
     setIsAuthenticated(false);
     setUser(null);
     setVehicles([]);
@@ -95,120 +173,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Error fetching vehicles:', error);
     }
   };
-
-  const signUp = async (identifier: string, password: string) => {
-    const idProvided = Boolean(identifier && identifier.trim().length > 0);
-    const passwordProvided = Boolean(password && password.trim().length > 0);
-
-    if (!idProvided) {
-      throw new Error('Email is required');
-    }
-
-    if (!passwordProvided) {
-      throw new Error('Password is required');
-    }
-
-    if (password.length < 6) {
-      throw new Error('Password must be at least 6 characters');
-    }
-
-    // Step 1: Create the user in Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email: identifier.trim(),
-      password,
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const sUser = data.user;
-    const session = data.session;
-
-    // Step 2: Upsert (insert or update) a user profile entry in the public.users table
-    if (sUser && sUser.id) {
-      try {
-        const { error: profileError } = await supabase
-          .from('users')
-          .upsert({
-            id: sUser.id,
-            email: identifier.trim(),
-            username: identifier.trim().split('@')[0],
-            role: 'user',
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'id' });
-
-        if (profileError) {
-          console.error('Error upserting user profile:', profileError);
-        }
-      } catch (profileError) {
-        console.error('Error upserting user profile:', profileError);
-      }
-    }
-
-    if (session && sUser) {
-      setUser({ id: sUser.id, email: sUser.email });
-      setIsAuthenticated(true);
-      return { requiresEmailConfirmation: false };
-    }
-    // If email confirmation is enabled, try immediate sign-in (works only if project allows unconfirmed email sign-in)
-    const loginAttempt = await supabase.auth.signInWithPassword({
-      email: identifier.trim(),
-      password,
-    });
-    if (!loginAttempt.error && loginAttempt.data.user) {
-      setUser({ id: loginAttempt.data.user.id, email: loginAttempt.data.user.email });
-      setIsAuthenticated(true);
-      return { requiresEmailConfirmation: false };
-    }
-
-    // Fallback: requires email confirmation in project settings
-    return { requiresEmailConfirmation: true };
-  };
-
-  // Initialize session and listen for auth state changes
-  useEffect(() => {
-    let isMounted = true;
-
-    const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      const currentSession = data.session;
-      if (!isMounted) return;
-      if (currentSession?.user) {
-        setUser({ id: currentSession.user.id, email: currentSession.user.email });
-        setIsAuthenticated(true);
-        // Load vehicles after authentication
-        setTimeout(() => refreshVehicles(), 100);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-        setVehicles([]);
-        setCurrentVehicle(null);
-      }
-    };
-
-    init();
-
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!isMounted) return;
-      if (session?.user) {
-        setUser({ id: session.user.id, email: session.user.email });
-        setIsAuthenticated(true);
-        // Load vehicles after authentication
-        setTimeout(() => refreshVehicles(), 100);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-        setVehicles([]);
-        setCurrentVehicle(null);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, []);
 
   // Load vehicles when user changes
   useEffect(() => {
@@ -240,4 +204,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return ctx;
-} 
+}

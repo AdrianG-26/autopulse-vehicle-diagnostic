@@ -124,8 +124,7 @@ class RaspberryPiAPI {
         headers: {
           "Content-Type": "application/json",
         },
-        // Timeout after 5 seconds
-        signal: AbortSignal.timeout(5000),
+        // Timeout removed for React Native compatibility
       });
 
       if (!response.ok) {
@@ -135,7 +134,7 @@ class RaspberryPiAPI {
       const data: ApiResponse = await response.json();
       return data;
     } catch (error: any) {
-      console.error("Error fetching latest data:", error);
+      // console.error("Error fetching latest data:", error);
       return {
         success: false,
         data: null,
@@ -235,7 +234,7 @@ class RaspberryPiAPI {
 
       return response.ok;
     } catch (error) {
-      console.error("Connection test failed:", error);
+      // console.error("Connection test failed:", error);
       return false;
     }
   }
@@ -249,7 +248,7 @@ class RaspberryPiAPI {
       if (!response.ok) throw new Error("Failed to fetch model info");
       return await response.json();
     } catch (error) {
-      console.error("Error fetching model info:", error);
+      // console.error("Error fetching model info:", error);
       return null;
     }
   }

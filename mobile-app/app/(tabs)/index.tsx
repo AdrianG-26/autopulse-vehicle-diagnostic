@@ -78,7 +78,7 @@ export default function HomeScreen() {
         <View style={styles.panelCard}>
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
-              <IconSymbol name="speedometer" size={24} color="#0a7ea4" />
+              <Ionicons name="analytics" size={24} color="#0a7ea4" />
               <ThemedText style={styles.panelRowLabel}>
                 ML Health Score
               </ThemedText>
@@ -94,11 +94,7 @@ export default function HomeScreen() {
 
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
-              <IconSymbol
-                name="shield.checkerboard"
-                size={24}
-                color="#0a7ea4"
-              />
+              <Ionicons name="shield-checkmark" size={24} color="#0a7ea4" />
               <ThemedText style={styles.panelRowLabel}>
                 System Status
               </ThemedText>
@@ -169,7 +165,7 @@ export default function HomeScreen() {
         <View style={styles.panelCard}>
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
-              <IconSymbol name="gauge" size={24} color="#0a7ea4" />
+              <Ionicons name="speedometer" size={24} color="#0a7ea4" />
               <ThemedText style={styles.panelRowLabel}>Engine RPM</ThemedText>
             </View>
             <ThemedText style={styles.healthScore}>
@@ -181,7 +177,7 @@ export default function HomeScreen() {
 
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
-              <IconSymbol name="thermometer" size={24} color="#0a7ea4" />
+              <Ionicons name="thermometer-outline" size={24} color="#0a7ea4" />
               <ThemedText style={styles.panelRowLabel}>Coolant Temp</ThemedText>
             </View>
             <ThemedText style={styles.healthScore}>
@@ -193,7 +189,7 @@ export default function HomeScreen() {
 
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
-              <IconSymbol name="speedometer" size={24} color="#0a7ea4" />
+              <Ionicons name="speedometer-outline" size={24} color="#0a7ea4" />
               <ThemedText style={styles.panelRowLabel}>Engine Load</ThemedText>
             </View>
             <ThemedText style={styles.healthScore}>
@@ -205,7 +201,7 @@ export default function HomeScreen() {
 
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
-              <IconSymbol name="stats-chart" size={24} color="#0a7ea4" />
+              <Ionicons name="stats-chart" size={24} color="#0a7ea4" />
               <ThemedText style={styles.panelRowLabel}>
                 Throttle Position
               </ThemedText>

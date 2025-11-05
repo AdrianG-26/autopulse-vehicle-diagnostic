@@ -6,17 +6,37 @@ import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet,
 
 export default function SignupScreen() {
   const { signUp } = useAuth();
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSignUp() {
+    if (!username.trim()) {
+      Alert.alert('Error', 'Username is required');
+      return;
+    }
+    if (!email.trim()) {
+      Alert.alert('Error', 'Email is required');
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password must be at least 6 characters');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
     try {
       setLoading(true);
-      await signUp(email, password);
-      Alert.alert('Account created', 'Your account has been created. You can now sign in.');
-      router.replace('/(auth)/login');
+      await signUp(username, email, password);
+      Alert.alert('Success', 'Account created successfully!');
+      router.replace('/(tabs)');
     } catch (error: any) {
       Alert.alert('Sign up failed', error?.message ?? 'Please try again.');
     } finally {
@@ -47,6 +67,24 @@ export default function SignupScreen() {
           </View>
 
           <View style={styles.formSection}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Username</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons name="person-outline" size={20} color="#9BA1A6" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.textInput}
+                  value={username}
+                  onChangeText={setUsername}
+                  placeholder="Choose a username"
+                  autoCapitalize="none"
+                  autoComplete="username"
+                  placeholderTextColor="#9BA1A6"
+                  returnKeyType="next"
+                  blurOnSubmit={false}
+                />
+              </View>
+            </View>
+
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Email</Text>
               <View style={styles.inputContainer}>
@@ -79,11 +117,33 @@ export default function SignupScreen() {
                   autoCapitalize="none"
                   autoComplete="password-new"
                   placeholderTextColor="#9BA1A6"
-                  returnKeyType="done"
-                  onSubmitEditing={handleSignUp}
+                  returnKeyType="next"
+                  blurOnSubmit={false}
                 />
                 <Pressable onPress={() => setShowPassword((v) => !v)} hitSlop={8} style={styles.visibilityButton}>
                   <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9BA1A6" />
+                </Pressable>
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Confirm Password</Text>
+              <View style={styles.inputContainer}>
+                <Ionicons name="lock-closed-outline" size={20} color="#9BA1A6" style={styles.inputIcon} />
+                <TextInput
+                  style={styles.textInput}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                  placeholder="Confirm your password"
+                  secureTextEntry={!showConfirmPassword}
+                  autoCapitalize="none"
+                  autoComplete="password-new"
+                  placeholderTextColor="#9BA1A6"
+                  returnKeyType="done"
+                  onSubmitEditing={handleSignUp}
+                />
+                <Pressable onPress={() => setShowConfirmPassword((v) => !v)} hitSlop={8} style={styles.visibilityButton}>
+                  <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9BA1A6" />
                 </Pressable>
               </View>
               <Text style={styles.passwordHint}>Password must be at least 6 characters</Text>
@@ -122,7 +182,7 @@ const BORDER_COLOR = '#D1D9DE';
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: BG, paddingHorizontal: 24 },
   scrollContent: { paddingBottom: 40 },
-  topSection: { alignItems: 'center', marginTop: 80, marginBottom: 32 },
+  topSection: { alignItems: 'center', marginTop: 60, marginBottom: 32 },
   brandContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   logoContainer: { position: 'relative', marginRight: 12, width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
   brandName: { fontSize: 28, fontWeight: '800', color: ACCENT_BLUE },
@@ -142,5 +202,3 @@ const styles = StyleSheet.create({
   secondaryButton: { marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: 'transparent', paddingHorizontal: 16, paddingVertical: 14, borderRadius: 10, alignSelf: 'stretch', justifyContent: 'center', borderWidth: 1, borderColor: '#C9D3DA' },
   secondaryButtonText: { color: ACCENT_BLUE, fontWeight: '800' },
 });
-
-
