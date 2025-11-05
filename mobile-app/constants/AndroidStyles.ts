@@ -3,66 +3,66 @@
  * Following Material Design 3 (Material You) guidelines
  */
 
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from "react-native";
 
 // Material Design 3 Color Palette
 export const MaterialColors = {
   // Primary
-  primary: '#0a7ea4',
-  primaryVariant: '#085f7d',
-  onPrimary: '#ffffff',
-  
+  primary: "#0a7ea4",
+  primaryVariant: "#085f7d",
+  onPrimary: "#ffffff",
+
   // Surface & Background
-  surface: '#ffffff',
-  surfaceVariant: '#f5f5f5',
-  background: '#fafafa',
-  
+  surface: "#ffffff",
+  surfaceVariant: "#f5f5f5",
+  background: "#fafafa",
+
   // Text
-  onSurface: '#1c1b1f',
-  onSurfaceVariant: '#49454f',
-  onBackground: '#1c1b1f',
-  
+  onSurface: "#1c1b1f",
+  onSurfaceVariant: "#49454f",
+  onBackground: "#1c1b1f",
+
   // Outline
-  outline: '#e0e0e0',
-  outlineVariant: '#c7c7c7',
-  
+  outline: "#e0e0e0",
+  outlineVariant: "#c7c7c7",
+
   // Status Colors
-  success: '#2ecc71',
-  warning: '#f39c12',
-  error: '#e74c3c',
-  info: '#3498db',
+  success: "#2ecc71",
+  warning: "#f39c12",
+  error: "#e74c3c",
+  info: "#3498db",
 };
 
 // Material Design Elevation (Android-specific)
 export const MaterialElevation = {
   level0: {
     elevation: 0,
-    shadowColor: 'transparent',
+    shadowColor: "transparent",
   },
   level1: {
     elevation: 1,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.18,
     shadowRadius: 1.0,
   },
   level2: {
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.20,
+    shadowOpacity: 0.2,
     shadowRadius: 1.41,
   },
   level3: {
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
   },
   level4: {
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.23,
     shadowRadius: 2.62,
@@ -73,84 +73,84 @@ export const MaterialElevation = {
 export const MaterialTypography = {
   displayLarge: {
     fontSize: 57,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 64,
   },
   displayMedium: {
     fontSize: 45,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 52,
   },
   displaySmall: {
     fontSize: 36,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 44,
   },
   headlineLarge: {
     fontSize: 32,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 40,
   },
   headlineMedium: {
     fontSize: 28,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 36,
   },
   headlineSmall: {
     fontSize: 24,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 32,
   },
   titleLarge: {
     fontSize: 22,
-    fontWeight: '500' as const,
+    fontWeight: "500" as const,
     lineHeight: 28,
   },
   titleMedium: {
     fontSize: 16,
-    fontWeight: '500' as const,
+    fontWeight: "500" as const,
     lineHeight: 24,
     letterSpacing: 0.15,
   },
   titleSmall: {
     fontSize: 14,
-    fontWeight: '500' as const,
+    fontWeight: "500" as const,
     lineHeight: 20,
     letterSpacing: 0.1,
   },
   bodyLarge: {
     fontSize: 16,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 24,
     letterSpacing: 0.5,
   },
   bodyMedium: {
     fontSize: 14,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 20,
     letterSpacing: 0.25,
   },
   bodySmall: {
     fontSize: 12,
-    fontWeight: '400' as const,
+    fontWeight: "400" as const,
     lineHeight: 16,
     letterSpacing: 0.4,
   },
   labelLarge: {
     fontSize: 14,
-    fontWeight: '500' as const,
+    fontWeight: "500" as const,
     lineHeight: 20,
     letterSpacing: 0.1,
   },
   labelMedium: {
     fontSize: 12,
-    fontWeight: '500' as const,
+    fontWeight: "500" as const,
     lineHeight: 16,
     letterSpacing: 0.5,
   },
   labelSmall: {
     fontSize: 11,
-    fontWeight: '500' as const,
+    fontWeight: "500" as const,
     lineHeight: 16,
     letterSpacing: 0.5,
   },
@@ -211,10 +211,10 @@ export const MaterialComponents = StyleSheet.create({
   filledButtonText: {
     ...MaterialTypography.labelLarge,
     color: MaterialColors.onPrimary,
-    textAlign: 'center',
+    textAlign: "center",
   },
   outlinedButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderRadius: MaterialBorderRadius.lg,
     paddingVertical: 10,
     paddingHorizontal: 24,
@@ -224,10 +224,10 @@ export const MaterialComponents = StyleSheet.create({
   outlinedButtonText: {
     ...MaterialTypography.labelLarge,
     color: MaterialColors.primary,
-    textAlign: 'center',
+    textAlign: "center",
   },
   textButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderRadius: MaterialBorderRadius.lg,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -235,13 +235,13 @@ export const MaterialComponents = StyleSheet.create({
   textButtonText: {
     ...MaterialTypography.labelLarge,
     color: MaterialColors.primary,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   // List Items
   listItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: MaterialSpacing.md,
     paddingHorizontal: MaterialSpacing.lg,
     minHeight: 56,
@@ -254,8 +254,8 @@ export const MaterialComponents = StyleSheet.create({
 
   // Chips
   chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: MaterialSpacing.md,
     paddingVertical: MaterialSpacing.xs,
     borderRadius: MaterialBorderRadius.sm,
@@ -270,13 +270,13 @@ export const MaterialComponents = StyleSheet.create({
 
   // FAB (Floating Action Button)
   fab: {
-    position: 'absolute',
+    position: "absolute",
     width: 56,
     height: 56,
     borderRadius: 16,
     backgroundColor: MaterialColors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     ...MaterialElevation.level3,
   },
 
@@ -292,7 +292,7 @@ export const MaterialComponents = StyleSheet.create({
 
 // Helper to get platform-specific elevation
 export const getElevation = (level: 0 | 1 | 2 | 3 | 4) => {
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     return { elevation: level };
   }
   // iOS fallback

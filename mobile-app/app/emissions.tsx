@@ -187,8 +187,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  brand: { 
-    fontSize: 20, 
+  brand: {
+    fontSize: 20,
     fontWeight: "500", // Material medium
     color: "#1c1b1f",
     letterSpacing: 0.15,
@@ -199,13 +199,13 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 6,
   },
-  title: { 
+  title: {
     fontSize: 22, // Material title large
-    fontWeight: "500", 
+    fontWeight: "500",
     color: "#1c1b1f",
     letterSpacing: 0,
   },
-  subtitle: { 
+  subtitle: {
     color: "#49454f",
     fontSize: 14,
     fontWeight: "400",
@@ -270,15 +270,15 @@ const styles = StyleSheet.create({
     borderColor: "#e0e0e0",
     minHeight: 48, // Material minimum touch target
   },
-  secondaryButtonText: { 
-    color: "#1c1b1f", 
+  secondaryButtonText: {
+    color: "#1c1b1f",
     fontWeight: "500",
     fontSize: 14,
     letterSpacing: 0.1,
   },
-  footer: { 
-    textAlign: "center", 
-    color: "#49454f", 
+  footer: {
+    textAlign: "center",
+    color: "#49454f",
     marginTop: 16,
     fontSize: 12,
     fontWeight: "400",
