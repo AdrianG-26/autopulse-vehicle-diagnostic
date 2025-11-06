@@ -1,0 +1,13 @@
+# Ignore frontend and mobile files - Render only deploys backend
+website/
+mobile-app/
+*.json
+*.md
+node_modules/
+.env
+.env.*
+!src/
+*.log
+__pycache__/
+*.pyc
+.DS_Store
