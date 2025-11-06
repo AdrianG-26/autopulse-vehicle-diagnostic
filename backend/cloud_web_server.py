@@ -7,7 +7,6 @@ for ML predictions instead of local SQLite, enabling real-time cloud analytics.
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_socketio import SocketIO
 from pathlib import Path
 import json
 import os
@@ -18,6 +17,15 @@ import joblib
 import logging
 import time
 import random
+
+# Optional SocketIO import
+try:
+    from flask_socketio import SocketIO
+    SOCKETIO_AVAILABLE = True
+except ImportError:
+    print("⚠️ flask-socketio not available, running without WebSocket support")
+    SOCKETIO_AVAILABLE = False
+    SocketIO = None
 
 # Import cloud storage
 try:
@@ -38,8 +46,13 @@ MODELS_DIR = BASE_DIR / "models"
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'vehicle_diagnostic_cloud_2025'
 
-# Initialize SocketIO with CORS enabled
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Initialize SocketIO if available
+if SOCKETIO_AVAILABLE:
+    socketio = SocketIO(app, cors_allowed_origins="*")
+    logger.info("✅ SocketIO initialized")
+else:
+    socketio = None
+    logger.info("⚠️ SocketIO not available")
 
 # Initialize CORS
 CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -68,13 +81,16 @@ class CloudMLPredictor:
         """Load the ML model with fallback options"""
         try:
             # Try to load the latest model
-            model_files = list(MODELS_DIR.glob("*.joblib"))
-            if model_files:
-                latest_model = max(model_files, key=os.path.getctime)
-                self.model = joblib.load(latest_model)
-                logger.info(f"✅ ML model loaded successfully: {latest_model.name}")
+            if MODELS_DIR.exists():
+                model_files = list(MODELS_DIR.glob("*.joblib"))
+                if model_files:
+                    latest_model = max(model_files, key=os.path.getctime)
+                    self.model = joblib.load(latest_model)
+                    logger.info(f"✅ ML model loaded successfully: {latest_model.name}")
+                else:
+                    logger.warning("⚠️ No model files found, using fallback predictions")
             else:
-                logger.warning("⚠️ No model files found, using fallback predictions")
+                logger.warning("⚠️ Models directory not found, using fallback predictions")
         except Exception as e:
             logger.error(f"❌ Error loading ML model: {e}")
             self.model = None
@@ -209,6 +225,8 @@ def health_check():
     return jsonify({
         "status": "healthy",
         "service": "AutoPulse Backend API", 
+        "socketio_available": SOCKETIO_AVAILABLE,
+        "cloud_storage_available": CLOUD_STORAGE_AVAILABLE,
         "timestamp": datetime.now(timezone.utc).isoformat()
     })
 
@@ -218,6 +236,7 @@ def get_status():
     return jsonify({
         'status': 'active',
         'cloud_storage': CLOUD_STORAGE_AVAILABLE,
+        'socketio_available': SOCKETIO_AVAILABLE,
         'ml_model_loaded': ml_predictor.model is not None,
         'timestamp': datetime.now(timezone.utc).isoformat(),
         'version': '2.0.0'

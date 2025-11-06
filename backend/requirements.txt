@@ -1,6 +1,7 @@
-# Minimal Working Requirements for Render
+# Backend Requirements - Minimal for Render
 flask>=2.0.0
 flask-cors>=3.0.0
+flask-socketio>=5.0.0
 supabase>=2.23.0
 pandas>=1.5.0
 numpy>=1.21.0,<2.0.0
