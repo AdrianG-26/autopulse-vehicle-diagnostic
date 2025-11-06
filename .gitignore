@@ -91,3 +91,13 @@ coverage/
 *.temp
 tmp/
 temp/
+
+# Vercel
+.vercel
+*.vercel.json
+
+# Build outputs
+website/build/
+build/
+dist/
+
