@@ -1,14 +1,13 @@
 services:
-  # Flask Backend API Server
+  # AutoPulse Flask Backend API Server
   - type: web
     name: autopulse-backend
     env: python
-    buildCommand: |
-      cd src
-      pip install -r requirements.txt
-    startCommand: |
-      cd src
-      python cloud_web_server.py
+    region: oregon
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python main.py
     envVars:
       - key: SUPABASE_URL
         sync: false
@@ -16,25 +15,5 @@ services:
         sync: false
       - key: FLASK_ENV
         value: production
-      - key: PORT
-        value: 10000
-    disk:
-      name: backend-disk
-      mountPath: /data
-      sizeGB: 1
-
-  # Optional: Vehicle Data Collector (Background Service)
-  - type: background
-    name: autopulse-collector
-    env: python
-    buildCommand: |
-      cd src
-      pip install -r requirements.txt
-    startCommand: |
-      cd src  
-      python cloud_collector_daemon.py
-    envVars:
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_KEY
-        sync: false
+      - key: PYTHONPATH
+        value: /opt/render/project/backend
