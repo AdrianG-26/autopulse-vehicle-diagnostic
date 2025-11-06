@@ -1,21 +1,25 @@
 #!/bin/bash
 
 # AutoPulse Control Script - Easy system management
+# Updated for organized file structure
+
+# Get the project root directory
+PROJECT_ROOT="/home/rocketeers/vehicle_diagnostic_system"
 
 case "$1" in
     "status")
         echo "🔍 AutoPulse System Status"
-        ./check_status.sh
+        "$PROJECT_ROOT/bin/check_status.sh"
         ;;
     "test")
         echo "🧪 Testing OBD Connection"
-        ./quick_obd_test.sh
+        "$PROJECT_ROOT/scripts/obd/quick_obd_test.sh"
         ;;
     "live")
         echo "📊 Starting Live Data Monitor"
         echo "💡 Make sure your car is ON and OBD scanner is connected!"
         read -p "Press Enter to continue or Ctrl+C to cancel..."
-        ./obd_live_data.sh
+        "$PROJECT_ROOT/scripts/obd/obd_live_data.sh"
         ;;
     "logs")
         echo "📋 Recent AutoPulse Logs"
@@ -26,9 +30,9 @@ case "$1" in
         echo "🚗 AutoPulse Service Logs:"
         sudo journalctl -u autopulse.service -n 10 --no-pager
         echo ""
-        if [ -f "/home/rocketeers/autopulse_logs/obd_autoconnect.log" ]; then
+        if [ -f "$PROJECT_ROOT/logs/obd_autoconnect.log" ]; then
             echo "📝 OBD Connection Log:"
-            tail -10 /home/rocketeers/autopulse_logs/obd_autoconnect.log
+            tail -10 "$PROJECT_ROOT/logs/obd_autoconnect.log"
         fi
         ;;
     "restart")
@@ -36,7 +40,7 @@ case "$1" in
         sudo systemctl restart autopulse.service
         sudo systemctl restart obd-autoconnect.service
         echo "✅ Services restarted"
-        ./check_status.sh
+        "$PROJECT_ROOT/bin/check_status.sh"
         ;;
     "stop")
         echo "🛑 Stopping AutoPulse Services"
@@ -49,13 +53,13 @@ case "$1" in
         sudo systemctl start autopulse.service
         sudo systemctl start obd-autoconnect.service
         echo "✅ Services started"
-        ./check_status.sh
+        "$PROJECT_ROOT/bin/check_status.sh"
         ;;
     *)
         echo "🚗 AutoPulse Control Panel"
         echo "========================="
         echo ""
-        echo "Usage: ./autopulse.sh [command]"
+        echo "Usage: ./autopulse [command]"
         echo ""
         echo "📊 Status & Monitoring:"
         echo "  status    - Show system status"
@@ -69,9 +73,15 @@ case "$1" in
         echo "  restart   - Restart AutoPulse services"
         echo ""
         echo "💡 Quick Start:"
-        echo "  1. ./autopulse.sh status    # Check system"
-        echo "  2. ./autopulse.sh test      # Test OBD"
-        echo "  3. ./autopulse.sh live      # Monitor data"
+        echo "  1. ./autopulse status    # Check system"
+        echo "  2. ./autopulse test      # Test OBD"
+        echo "  3. ./autopulse live      # Monitor data"
+        echo ""
+        echo "📁 File Organization:"
+        echo "  bin/           - Main control scripts"
+        echo "  scripts/obd/   - OBD-related tools"
+        echo "  scripts/system/ - System management"
+        echo "  docs/          - Documentation"
         echo ""
         echo "🚗 Ready for vehicle diagnostics!"
         ;;
