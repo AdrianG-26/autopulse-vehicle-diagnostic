@@ -1,0 +1,16 @@
+{
+  "name": "autopulse-vehicle-diagnostic",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install-website": "cd website && npm install",
+    "build-website": "cd website && npm install && npm run build",
+    "start-website": "cd website && npm start",
+    "build": "npm run build-website",
+    "start": "npm run start-website"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
