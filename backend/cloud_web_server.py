@@ -6,6 +6,8 @@ for ML predictions instead of local SQLite, enabling real-time cloud analytics.
 """
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
+from flask_socketio import SocketIO
 from pathlib import Path
 import json
 import os
@@ -34,6 +36,9 @@ MODELS_DIR = BASE_DIR / "models"
 
 # Create Flask app
 app = Flask(__name__)
+\n# Initialize SocketIO with CORS enabled
+socketio = SocketIO(app, cors_allowed_origins="*")
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 app.config['SECRET_KEY'] = 'vehicle_diagnostic_cloud_2025'
 
 # Enable CORS
@@ -229,6 +234,15 @@ class CloudMLPredictor:
 ml_predictor = CloudMLPredictor()
 
 # API Routes
+@app.route("/")
+def health_check():
+    """Root health check endpoint for Render"""
+    return jsonify({
+        "status": "healthy",
+        "service": "AutoPulse Backend API",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    })
+
 @app.route('/api/status')
 def api_status():
     """System status endpoint"""
