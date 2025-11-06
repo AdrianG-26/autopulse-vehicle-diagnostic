@@ -1,0 +1,31 @@
+[Unit]
+Description=AutoPulse Vehicle Diagnostic System - Auto-Startup Service
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=rocketeers
+Group=rocketeers
+WorkingDirectory=/home/rocketeers/vehicle_diagnostic_system
+Environment="PATH=/home/rocketeers/vehicle_diagnostic_system/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Start the complete auto-startup system
+ExecStart=/home/rocketeers/vehicle_diagnostic_system/rpi_autostart.sh
+
+# Restart on failure with backoff
+Restart=on-failure
+RestartSec=30
+StartLimitInterval=300
+StartLimitBurst=5
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=autopulse
+
+# Wait for network before starting
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

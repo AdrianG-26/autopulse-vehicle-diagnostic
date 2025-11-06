@@ -1,57 +1,78 @@
 #!/bin/bash
-# 🔍 Quick System Status Check
 
-echo "════════════════════════════════════════════════════════"
-echo "🚗 Vehicle Diagnostic System - Status Check"
-echo "════════════════════════════════════════════════════════"
+# Simple Status Check Script for AutoPulse System
+
+echo "🚗 AutoPulse System Status Check"
+echo "================================"
+
+# Check system services
+echo "📊 System Services:"
+echo -n "  • AutoPulse Service: "
+if systemctl is-active --quiet autopulse.service 2>/dev/null; then
+    echo "✅ Running"
+else
+    echo "❌ Stopped"
+fi
+
+echo -n "  • OBD Auto-Connect: "
+if systemctl is-active --quiet obd-autoconnect.service 2>/dev/null; then
+    echo "✅ Active"
+else
+    echo "❌ Inactive"
+fi
+
+# Check OBD connection
 echo ""
-
-# Check Flask API
-if pgrep -f "web_server.py" > /dev/null; then
-    echo "✅ Flask API Server: RUNNING"
-    echo "   http://localhost:5000"
+echo "🔌 OBD Scanner Status:"
+echo -n "  • Bluetooth Pairing: "
+if bluetoothctl devices Paired | grep -q "00:1D:A5:68:98:8A"; then
+    echo "✅ Paired"
 else
-    echo "❌ Flask API Server: STOPPED"
+    echo "❌ Not paired"
 fi
 
-# Check WebSocket
-if pgrep -f "websocket_server.py" > /dev/null; then
-    echo "✅ WebSocket Server: RUNNING"
-    echo "   ws://localhost:8080"
+echo -n "  • Serial Device: "
+if [ -c "/dev/rfcomm0" ]; then
+    echo "✅ /dev/rfcomm0"
 else
-    echo "❌ WebSocket Server: STOPPED"
+    echo "❌ Missing"
 fi
 
-# Check Data Collector
-if pgrep -f "automated_car_collector_daemon.py" > /dev/null; then
-    echo "✅ OBD Collector: RUNNING"
+# Check network
+echo ""
+echo "🌐 Network Status:"
+echo -n "  • Internet: "
+if ping -c 1 google.com &> /dev/null; then
+    echo "✅ Connected"
 else
-    echo "❌ OBD Collector: STOPPED"
+    echo "❌ No connection"
 fi
 
-# Check React
-if pgrep -f "react-scripts" > /dev/null; then
-    echo "✅ React Frontend: RUNNING"
-    echo "   http://localhost:3000"
+# Check virtual environment
+echo ""
+echo "🐍 Python Environment:"
+echo -n "  • Virtual Env: "
+if [ -d ".venv" ]; then
+    echo "✅ Ready"
 else
-    echo "❌ React Frontend: STOPPED"
+    echo "❌ Missing"
 fi
+
+# Show quick commands
+echo ""
+echo "🔧 Quick Commands:"
+echo "  ./quick_obd_test.sh        - Test OBD connection"
+echo "  ./obd_live_data.sh         - Show live vehicle data"
+echo "  ./setup_obd_connection.sh  - Fix OBD connection"
+echo "  sudo reboot                - Restart system"
+
+# Show system info
+echo ""
+echo "💻 System Info:"
+echo "  • Uptime: $(uptime -p)"
+echo "  • Load: $(uptime | awk -F'load average:' '{print $2}')"
+echo "  • Memory: $(free -h | awk '/^Mem:/ {print $3"/"$2}')"
+echo "  • Disk: $(df -h / | awk 'NR==2 {print $3"/"$2" ("$5" used)"}')"
 
 echo ""
-echo "════════════════════════════════════════════════════════"
-echo "📊 Quick Stats:"
-
-# Check database
-if [ -f "/home/rocketeers/vehicle_diagnostic_system/src/data/vehicle_diagnostic.db" ]; then
-    RECORDS=$(sqlite3 /home/rocketeers/vehicle_diagnostic_system/src/data/vehicle_diagnostic.db "SELECT COUNT(*) FROM sensor_data" 2>/dev/null || echo "N/A")
-    echo "   Database records: $RECORDS"
-fi
-
-# Check ML model
-if [ -f "/home/rocketeers/vehicle_diagnostic_system/src/models/vehicle_maintenance_rf_rpi_compatible_20251026_200238.joblib" ]; then
-    echo "   ML Model: ✅ Loaded (99.94% accuracy)"
-else
-    echo "   ML Model: ❌ Not found"
-fi
-
-echo "════════════════════════════════════════════════════════"
+echo "✨ System ready for vehicle diagnostics!"

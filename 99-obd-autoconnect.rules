@@ -1,0 +1,15 @@
+# AutoPulse OBD Auto-Connection Rules
+
+# Bluetooth OBD-II devices
+SUBSYSTEM=="tty", KERNEL=="rfcomm*", MODE="0666", GROUP="dialout", TAG+="systemd", ENV{SYSTEMD_WANTS}="obd-autoconnect.service"
+
+# USB OBD-II adapters (common vendor IDs)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE="0666", GROUP="dialout", SYMLINK+="obd-adapter", TAG+="systemd", ENV{SYSTEMD_WANTS}="obd-autoconnect.service"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0666", GROUP="dialout", SYMLINK+="obd-adapter", TAG+="systemd", ENV{SYSTEMD_WANTS}="obd-autoconnect.service"
+
+# Generic USB-to-Serial adapters
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", MODE="0666", GROUP="dialout"
+SUBSYSTEM=="tty", KERNEL=="ttyACM*", MODE="0666", GROUP="dialout"
+
+# Add user to dialout group for OBD access
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyUSB*|ttyACM*|rfcomm*", RUN+="/usr/bin/usermod -a -G dialout rocketeers"
