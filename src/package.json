@@ -1,9 +1,0 @@
-{
-  "name": "autopulse-src-proxy",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "start": "cd ../website && npm start",
-    "build": "cd ../website && npm install && npm run build"
-  }
-}

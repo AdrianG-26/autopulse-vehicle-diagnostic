@@ -3,14 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "install-website": "cd website && npm install",
-    "build-website": "cd website && npm install && npm run build",
-    "start-website": "cd website && npm start",
-    "build": "npm run build-website",
-    "start": "npm run start-website"
+    "build": "cd website && npm install && npm run build",
+    "start": "cd website && npm install && npm install -g serve && serve -s build -l $PORT"
   },
   "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
