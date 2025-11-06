@@ -1,17 +1,31 @@
 // Vehicle ML API Service
 // Connects React frontend to Raspberry Pi ML prediction system
+// Supports mock API for deployed demos
 import React from "react";
+import { mockMLService } from "./mockMLService";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const USE_MOCK_API = process.env.REACT_APP_USE_MOCK_API === "true";
 
 class VehicleMLService {
   constructor() {
     this.isConnected = false;
     this.lastHealthCheck = null;
-    this.checkConnection();
+    this.useMock = USE_MOCK_API;
+    
+    if (this.useMock) {
+      console.log("🎭 Using Mock ML API for demo");
+      this.isConnected = true;
+    } else {
+      this.checkConnection();
+    }
   }
 
   async checkConnection() {
+    if (this.useMock) {
+      return await mockMLService.checkConnection();
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/model-info`, {
         method: "GET",
@@ -32,6 +46,10 @@ class VehicleMLService {
   }
 
   async predictVehicleHealth(sensorData) {
+    if (this.useMock) {
+      return await mockMLService.predictVehicleHealth(sensorData);
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/predict`, {
         method: "POST",
@@ -76,6 +94,10 @@ class VehicleMLService {
   }
 
   async getCurrentHealth() {
+    if (this.useMock) {
+      return await mockMLService.getCurrentHealth();
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/current-health`);
       if (response.ok) {
@@ -88,6 +110,10 @@ class VehicleMLService {
   }
 
   async getMaintenanceAlerts() {
+    if (this.useMock) {
+      return await mockMLService.getMaintenanceAlerts();
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/alerts`);
       if (response.ok) {
@@ -100,6 +126,10 @@ class VehicleMLService {
   }
 
   async getSensorData() {
+    if (this.useMock) {
+      return await mockMLService.getSensorData();
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/sensor-data`);
       if (response.ok) {
@@ -113,6 +143,12 @@ class VehicleMLService {
 
   // Health score to color mapping for UI
   getHealthScoreColor(score) {
+    return this.useMock ? 
+      mockMLService.getHealthScoreColor(score) :
+      this._getHealthScoreColor(score);
+  }
+
+  _getHealthScoreColor(score) {
     if (score >= 80) return "#10b981"; // Green
     if (score >= 60) return "#f59e0b"; // Yellow
     if (score >= 40) return "#ef4444"; // Red
@@ -121,6 +157,12 @@ class VehicleMLService {
 
   // Status to display mapping
   getStatusDisplay(status) {
+    return this.useMock ?
+      mockMLService.getStatusDisplay(status) :
+      this._getStatusDisplay(status);
+  }
+
+  _getStatusDisplay(status) {
     const statusMap = {
       NORMAL: { text: "Excellent", color: "#10b981", icon: "✅" },
       ADVISORY: { text: "Good", color: "#f59e0b", icon: "💡" },
@@ -133,13 +175,18 @@ class VehicleMLService {
 
   // Convert alerts to UI format
   formatAlertsForUI(alerts) {
+    return this.useMock ?
+      mockMLService.formatAlertsForUI(alerts) :
+      this._formatAlertsForUI(alerts);
+  }
+
+  _formatAlertsForUI(alerts) {
     return alerts.map((alert, index) => {
       let type = "info";
       if (alert.includes("CRITICAL")) type = "error";
       else if (alert.includes("WARNING")) type = "warning";
       else if (alert.includes("ADVISORY")) type = "warning";
 
-      // Extract title and message
       const parts = alert.split(":");
       const title = parts[0]?.trim() || "Vehicle Alert";
       const message = parts.slice(1).join(":").trim() || alert;
@@ -150,7 +197,7 @@ class VehicleMLService {
         title,
         message,
         timestamp: Date.now(),
-        source: "ML Prediction",
+        source: this.useMock ? "Mock ML API" : "ML Prediction",
       };
     });
   }
