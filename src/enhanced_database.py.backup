@@ -801,7 +801,7 @@ class EnhancedVehicleDatabase:
             print(f"   📋 {row['make']} {row['model']} {row['year']} | {row['fuel_type']} | {row['transmission_type']}")
             if row['engine_size']:
                 print(f"   🔧 Engine: {row['engine_size']}")
-            if row.get('vin'):
+            if row['vin']:
                 print(f"   🏷️  VIN: {row['vin']}")
             print(f"   📅 Created: {row['created_at']} | Last Used: {row['last_used']}")
             print(f"   📊 Sessions: {row['total_sessions']} | Records: {row['total_records']} | Status: {row['activity_status']}")
@@ -846,18 +846,10 @@ class EnhancedVehicleDatabase:
                     car_info = row['car_display_name'] if row['car_display_name'] else "Unknown Car"
                     status_emoji = "🟢" if row['status'] == 'Normal' else "🟡" if row['status'] == 'Warning' else "🔴"
                     
-                    print(f"🕐 {row['timestamp']} | 🚗 {car_info}")                    # Handle None values
-                    rpm = row['rpm'] if row['rpm'] is not None else 0
-                    load = row['engine_load'] if row['engine_load'] is not None else 0
-                    temp = row['coolant_temp'] if row['coolant_temp'] is not None else 0
-                    speed = row['vehicle_speed'] if row['vehicle_speed'] is not None else 0
-                    fuel = row['fuel_level'] if row['fuel_level'] is not None else 0
-                    stress = row['engine_stress_score'] if row['engine_stress_score'] is not None else 0
-                    fault = row['fault_type'] if row['fault_type'] is not None else 'None'
-                    
-                    print(f"   {status_emoji} Status: {row['status']:8} | RPM: {rpm:6.0f} | Load: {load:5.1f}%")
-                    print(f"   🌡️  Temp: {temp:5.1f}°C | 🚀 Speed: {speed:5.1f} km/h | ⛽ Fuel: {fuel:5.1f}%")
-                    print(f"   📈 Stress: {stress:5.1f} | ⚠️  Fault: {fault}")
+                    print(f"🕐 {row['timestamp']} | 🚗 {car_info}")
+                    print(f"   {status_emoji} Status: {row['status']:8} | RPM: {row['rpm']:6.0f} | Load: {row['engine_load']:5.1f}%")
+                    print(f"   🌡️  Temp: {row['coolant_temp']:5.1f}°C | 🚀 Speed: {row['vehicle_speed']:5.1f} km/h | ⛽ Fuel: {row['fuel_level']:5.1f}%")
+                    print(f"   📈 Stress: {row['engine_stress_score']:5.1f} | ⚠️  Fault: {row['fault_type']}")
                     print()
                     
         except Exception as e:
