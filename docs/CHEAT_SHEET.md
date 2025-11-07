@@ -601,7 +601,8 @@ nmcli connection show
 # Connect to network
 sudo nmcli device wifi connect "huh" password "luwawsa2025"
 sudo nmcli device wifi connect "PLDTHOMEFIBRGLVZ" password "ALGalvez_261528"
-sudo nmcli device wifi connect "ZTE_MU5002_AD" password "AdrianGalvez_2025"
+sudo nmcli device wifi connect "ZTEMU5002AD" password "AdrianGalvez_2025"
+sudo nmcli device wifi connect "WIFI NI BRIAN" password "Brianronnie2019!"
 
 
 # Network performance testing
