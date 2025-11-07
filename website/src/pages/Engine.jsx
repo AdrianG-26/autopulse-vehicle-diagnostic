@@ -1,3 +1,4 @@
+import { supabase } from "../services/supabase";
 import React, { useEffect, useState } from "react";
 
 export default function Engine({ onNavigate }) {
@@ -9,7 +10,16 @@ export default function Engine({ onNavigate }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const API_BASE =
+        // Using Supabase directly
+        const { data, error } = await supabase.from("sensor_data").select("*").order("timestamp", { ascending: false }).limit(1);
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const latest = data[0];
+          setRawData({ rpm: latest.rpm, speed: latest.vehicle_speed, coolant_temp: latest.coolant_temp, engine_load: latest.engine_load, throttle_pos: latest.throttle_pos });
+          setPollingStatus("CONNECTED");
+        } else { setPollingStatus("WAITING"); }
+        return;
+        const API_BASE_OLD =
           process.env.REACT_APP_API_URL || "http://localhost:5000";
         const response = await fetch(`${API_BASE}/api/latest`);
         const result = await response.json();
