@@ -36,7 +36,7 @@ export default function Engine({ onNavigate }) {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 30000); // 30 seconds
+    const interval = setInterval(fetchData, 10000); // 30 seconds
     return () => clearInterval(interval);
   }, []);
 

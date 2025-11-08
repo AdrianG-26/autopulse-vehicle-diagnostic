@@ -324,9 +324,6 @@ class ProfessionalCloudCollector:
                 consecutive_errors += 1
                 time.sleep(5)
         
-        # Clear running flag so main() knows we stopped
-        self.running.clear()
-
         # Final batch
         if self.data_buffer:
             logger.info("💾 Storing final data batch...")
@@ -429,46 +426,34 @@ class ProfessionalCloudCollector:
         
         logger.info("✅ Cloud collection stopped")
 
+
 def main():
-    """Main entry point - runs forever, auto-reconnects"""
+    """Main entry point"""
     print("🚀 Professional Cloud Vehicle Data Collector")
     print("="*55)
     print("☁️  Direct Supabase storage (no local SQLite)")
     print("📊 Real-time OBD-II data collection")
     print("📈 Multi-table storage with proper schema")
-    print("🔄 Auto-reconnect on OBD disconnection")
     print("="*55)
     print()
     
-    while True:  # Loop forever, auto-restart
-        collector = ProfessionalCloudCollector()
-        
-        try:
-            if collector.start_collection():
-                print("\n🔄 Cloud collector running... Press Ctrl+C to stop")
-                
-                # Wait for completion (will exit on OBD error)
-                while collector.running.is_set():
-                    time.sleep(1)
-                
-                # If we get here, collection stopped (car off/OBD lost)
-                print("\n⚠️  Collection stopped (OBD disconnected)")
-                print("⏳ Waiting 30 seconds before reconnect attempt...")
-                time.sleep(30)
-                
-            else:
-                print("❌ Failed to start - waiting 30s before retry...")
-                time.sleep(30)
-                
-        except KeyboardInterrupt:
-            print("\n🛑 Interrupted by user")
-            collector.stop_collection()
-            break  # Exit the forever loop
-        except Exception as e:
-            logger.error(f"Unexpected error: {e}")
-            collector.stop_collection()
-            print(f"⏳ Error encountered - waiting 30s before retry...")
-            time.sleep(30)
+    collector = ProfessionalCloudCollector()
+    
+    try:
+        if collector.start_collection():
+            print("\n🔄 Cloud collector running... Press Ctrl+C to stop")
+            
+            # Wait for completion
+            while collector.running.is_set():
+                time.sleep(1)
+        else:
+            print("❌ Failed to start cloud collection")
+            sys.exit(1)
+            
+    except KeyboardInterrupt:
+        print("\n🛑 Interrupted by user")
+    finally:
+        collector.stop_collection()
 
 
 if __name__ == "__main__":
