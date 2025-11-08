@@ -1,0 +1,32 @@
+[Unit]
+Description=AutoPulse OBD-II Cloud Data Collector
+Documentation=https://github.com/yourusername/autopulse
+After=network-online.target bluetooth.target
+Wants=network-online.target bluetooth.target
+Requires=network-online.target
+
+[Service]
+Type=simple
+User=rocketeers
+Group=rocketeers
+WorkingDirectory=/home/rocketeers/vehicle_diagnostic_system/src
+Environment="PYTHONUNBUFFERED=1"
+Environment="SUPABASE_URL=https://qimiewqthuhmofjhzrrb.supabase.co"
+Environment="SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbWlld3F0aHVobW9mamh6cnJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU1Mjc5MTMsImV4cCI6MjA3MTEwMzkxM30.jHY0m_l-uvwaZd-x9POEpLdoP__oLUdE-7U-E5mZqz0"
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/bin/python3 /home/rocketeers/vehicle_diagnostic_system/src/cloud_collector_daemon_pro.py
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+MemoryLimit=256M
+CPUQuota=50%
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

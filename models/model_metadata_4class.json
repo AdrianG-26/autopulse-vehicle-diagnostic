@@ -1,0 +1,54 @@
+{
+  "model_type": "RandomForestClassifier",
+  "classification_type": "4-class",
+  "classes": {
+    "0": "NORMAL",
+    "1": "ADVISORY",
+    "3": "CRITICAL"
+  },
+  "training_date": "2025-11-08T22:04:39.234837",
+  "total_samples": 8125,
+  "training_samples": 6500,
+  "testing_samples": 1625,
+  "accuracy": 0.9563076923076923,
+  "features": [
+    "rpm",
+    "vehicle_speed",
+    "coolant_temp",
+    "engine_load",
+    "throttle_pos",
+    "intake_temp",
+    "control_module_voltage",
+    "fuel_level",
+    "barometric_pressure",
+    "engine_runtime",
+    "fuel_pressure",
+    "timing_advance",
+    "maf",
+    "engine_stress_score",
+    "load_rpm_ratio",
+    "temp_gradient",
+    "fuel_efficiency",
+    "rpm_load_ratio",
+    "temp_efficiency",
+    "speed_throttle_ratio",
+    "high_rpm",
+    "low_speed",
+    "high_throttle",
+    "voltage_health",
+    "stress_indicator"
+  ],
+  "num_features": 25,
+  "hyperparameters": {
+    "n_estimators": 200,
+    "max_depth": 15,
+    "min_samples_split": 10,
+    "min_samples_leaf": 5,
+    "class_weight": "balanced"
+  },
+  "class_distribution": {
+    "NORMAL": 6474,
+    "ADVISORY": 946,
+    "CRITICAL": 705
+  }
+}

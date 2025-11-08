@@ -1,0 +1,26 @@
+# Raspberry Pi Complete Requirements
+# All dependencies needed for AutoPulse on RPi
+
+# OBD-II Communication
+obd==0.7.1
+pyserial>=3.5
+
+# Cloud Database
+supabase>=2.23.0
+python-dotenv>=0.19.0
+
+# Data Processing
+pandas>=1.5.0
+numpy>=1.21.0,<2.0.0
+
+# Machine Learning
+scikit-learn>=1.0.0
+joblib>=1.2.0
+
+# Web Server (optional for local API)
+flask>=2.0.0
+flask-cors>=3.0.0
+flask-socketio>=5.0.0
+
+# Utilities
+requests>=2.25.0
