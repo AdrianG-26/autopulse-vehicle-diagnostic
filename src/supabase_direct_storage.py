@@ -112,25 +112,66 @@ class SupabaseDirectStorage:
             return None
     
     def store_sensor_data_batch(self, vehicle_id: int, sensor_readings: List[Dict]) -> bool:
-        """Store multiple sensor readings efficiently"""
+        """Store multiple sensor readings with ALL 30 OBD parameters"""
         if not self.is_connected or not sensor_readings:
             return False
             
         try:
-            # Prepare batch data
+            # Prepare batch data with ALL parameters
             batch_data = []
             for reading in sensor_readings:
                 sensor_record = {
                     'vehicle_id': vehicle_id,
                     'session_id': reading.get('session_id', 'direct_upload'),
                     'timestamp': reading.get('timestamp', datetime.now(timezone.utc).isoformat()),
+                    
+                    # Core Engine (8)
                     'rpm': reading.get('rpm', 0),
-                    'speed_mph': reading.get('speed', 0),
-                    'coolant_temp_c': reading.get('coolant_temp', 0),
-                    'engine_load_pct': reading.get('engine_load', 0),
-                    'throttle_position_pct': reading.get('throttle_pos', 0),
-                    'fuel_level_pct': reading.get('fuel_level', 0),
-                    'data_quality_score': reading.get('data_quality', 90)
+                    'speed': reading.get('speed', 0),
+                    'coolant_temp': reading.get('coolant_temp', 0),
+                    'engine_load': reading.get('engine_load', 0),
+                    'intake_temp': reading.get('intake_temp', 0),
+                    'timing_advance': reading.get('timing_advance', 0),
+                    'run_time': reading.get('run_time', 0),
+                    'absolute_load': reading.get('absolute_load', 0),
+                    
+                    # Fuel System (7)
+                    'fuel_level': reading.get('fuel_level', 0),
+                    'fuel_pressure': reading.get('fuel_pressure', 0),
+                    'throttle_pos': reading.get('throttle_pos', 0),
+                    'short_fuel_trim_1': reading.get('short_fuel_trim_1', 0),
+                    'long_fuel_trim_1': reading.get('long_fuel_trim_1', 0),
+                    'short_fuel_trim_2': reading.get('short_fuel_trim_2', 0),
+                    'long_fuel_trim_2': reading.get('long_fuel_trim_2', 0),
+                    
+                    # Air Intake (3)
+                    'maf': reading.get('maf', 0),
+                    'intake_pressure': reading.get('intake_pressure', 0),
+                    'barometric_pressure': reading.get('barometric_pressure', 0),
+                    
+                    # Emissions (3)
+                    'o2_b1s1': reading.get('o2_b1s1', 0),
+                    'o2_b1s2': reading.get('o2_b1s2', 0),
+                    'catalyst_temp_b1s1': reading.get('catalyst_temp_b1s1', 0),
+                    
+                    # Environmental (1)
+                    'ambient_air_temp': reading.get('ambient_air_temp', 0),
+                    
+                    # Electrical (1)
+                    'control_module_voltage': reading.get('control_module_voltage', 0),
+                    
+                    # Diagnostic (5)
+                    'distance_w_mil': reading.get('distance_w_mil', 0),
+                    'dtc_count': reading.get('dtc_count', 0),
+                    'mil_status': reading.get('mil_status', False),
+                    'fuel_status': reading.get('fuel_status', 'Unknown'),
+                    
+                    # ML Training (1)
+                    'health_status': reading.get('health_status', 0),
+                    
+                    # Metadata
+                    'data_quality': reading.get('data_quality', 90),
+                    'status': reading.get('status', 'NORMAL')
                 }
                 batch_data.append(sensor_record)
             

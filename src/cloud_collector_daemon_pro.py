@@ -213,7 +213,7 @@ class ProfessionalCloudCollector:
             return False
     
     def read_obd_data(self):
-        """Read comprehensive OBD sensor data"""
+        """Read comprehensive OBD sensor data - EXPANDED with 30 parameters + Auto-labeling"""
         if not self.connection or not self.connection.is_connected():
             return None
         
@@ -222,16 +222,45 @@ class ProfessionalCloudCollector:
             'session_id': self.session_id
         }
         
-        # Priority commands
+        # ALL OBD COMMANDS (27 raw + 3 special)
         obd_commands = {
+            # Core Engine (8)
             'rpm': obd.commands.RPM,
             'speed': obd.commands.SPEED,
             'coolant_temp': obd.commands.COOLANT_TEMP,
             'engine_load': obd.commands.ENGINE_LOAD,
-            'throttle_pos': obd.commands.THROTTLE_POS,
-            'fuel_level': obd.commands.FUEL_LEVEL,
             'intake_temp': obd.commands.INTAKE_TEMP,
+            'timing_advance': obd.commands.TIMING_ADVANCE,
+            'run_time': obd.commands.RUN_TIME,
+            'absolute_load': obd.commands.ABSOLUTE_LOAD,
+            
+            # Fuel System (7)
+            'fuel_level': obd.commands.FUEL_LEVEL,
+            'fuel_pressure': obd.commands.FUEL_PRESSURE,
+            'throttle_pos': obd.commands.THROTTLE_POS,
+            'short_fuel_trim_1': obd.commands.SHORT_FUEL_TRIM_1,
+            'long_fuel_trim_1': obd.commands.LONG_FUEL_TRIM_1,
+            'short_fuel_trim_2': obd.commands.SHORT_FUEL_TRIM_2,
+            'long_fuel_trim_2': obd.commands.LONG_FUEL_TRIM_2,
+            
+            # Air Intake (3)
             'maf': obd.commands.MAF,
+            'intake_pressure': obd.commands.INTAKE_PRESSURE,
+            'barometric_pressure': obd.commands.BAROMETRIC_PRESSURE,
+            
+            # Emissions (3)
+            'o2_b1s1': obd.commands.O2_B1S1,
+            'o2_b1s2': obd.commands.O2_B1S2,
+            'catalyst_temp_b1s1': obd.commands.CATALYST_TEMP_B1S1,
+            
+            # Environmental (1)
+            'ambient_air_temp': obd.commands.AMBIANT_AIR_TEMP,
+            
+            # Electrical (1)
+            'control_module_voltage': obd.commands.CONTROL_MODULE_VOLTAGE,
+            
+            # Diagnostic (2)
+            'distance_w_mil': obd.commands.DISTANCE_W_MIL,
         }
         
         successful_reads = 0
@@ -244,26 +273,77 @@ class ProfessionalCloudCollector:
                         value = response.value.magnitude if hasattr(response.value, 'magnitude') else float(response.value)
                         data[key] = value
                         successful_reads += 1
-                    else:
-                        data[key] = 0
-                except:
+                except Exception as e:
+                    logger.debug(f"Failed {key}: {e}")
                     data[key] = 0
             else:
                 data[key] = 0
         
-        # Calculate quality score
-        data['data_quality'] = int((successful_reads / len(obd_commands)) * 100) if obd_commands else 0
+        # DTC Count
+        try:
+            dtc_resp = self.connection.query(obd.commands.GET_DTC)
+            data['dtc_count'] = len(dtc_resp.value) if dtc_resp and not dtc_resp.is_null() and isinstance(dtc_resp.value, list) else 0
+        except:
+            data['dtc_count'] = 0
         
-        # Add status
-        coolant = data.get('coolant_temp', 0)
-        if coolant > 110:
-            data['status'] = 'CRITICAL'
-        elif coolant > 100:
-            data['status'] = 'WARNING'
-        else:
-            data['status'] = 'NORMAL'
+        # MIL Status
+        try:
+            status_resp = self.connection.query(obd.commands.STATUS)
+            data['mil_status'] = bool(status_resp.value.MIL) if status_resp and not status_resp.is_null() and hasattr(status_resp.value, 'MIL') else False
+        except:
+            data['mil_status'] = False
         
-        return data
+        # Fuel System Status
+        try:
+            fuel_resp = self.connection.query(obd.commands.FUEL_STATUS)
+            data['fuel_status'] = str(fuel_resp.value) if fuel_resp and not fuel_resp.is_null() else 'Unknown'
+        except:
+            data['fuel_status'] = 'Unknown'
+        
+        # AUTO-LABEL HEALTH STATUS
+        data['health_status'] = self._auto_label_health(data)
+        
+        # Quality score
+        total = len(obd_commands) + 3
+        data['data_quality'] = int((successful_reads / total) * 100)
+        
+        # Legacy status
+        data['status'] = ['NORMAL', 'ADVISORY', 'WARNING', 'CRITICAL'][data['health_status']]
+        
+        return data if successful_reads > 0 else None
+    
+    def _auto_label_health(self, data):
+        """Auto-label: 0=NORMAL, 1=ADVISORY, 2=WARNING, 3=CRITICAL"""
+        
+        # CRITICAL (3)
+        if (data.get('coolant_temp', 0) > 110 or
+            data.get('fuel_level', 100) < 3 or
+            data.get('control_module_voltage', 14) < 11 or
+            data.get('dtc_count', 0) > 10 or
+            data.get('catalyst_temp_b1s1', 0) > 900):
+            return 3
+        
+        # WARNING (2)
+        if (data.get('coolant_temp', 0) > 100 or
+            data.get('fuel_level', 100) < 10 or
+            data.get('control_module_voltage', 14) < 12 or
+            data.get('dtc_count', 0) >= 3 or
+            abs(data.get('short_fuel_trim_1', 0)) > 20 or
+            data.get('mil_status', False) or
+            data.get('distance_w_mil', 0) > 50):
+            return 2
+        
+        # ADVISORY (1)
+        if (data.get('coolant_temp', 0) > 95 or
+            data.get('fuel_level', 100) < 25 or
+            data.get('control_module_voltage', 14) < 13 or
+            data.get('dtc_count', 0) >= 1 or
+            abs(data.get('long_fuel_trim_1', 0)) > 10 or
+            abs(data.get('o2_b1s1', 0.45) - 0.45) > 0.3 or
+            data.get('catalyst_temp_b1s1', 0) > 750):
+            return 1
+        
+        return 0  # NORMAL
     
     def data_collection_loop(self):
         """Main data collection loop with professional logging"""
