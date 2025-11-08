@@ -112,26 +112,82 @@ class SupabaseDirectStorage:
             return None
     
     def store_sensor_data_batch(self, vehicle_id: int, sensor_readings: List[Dict]) -> bool:
-        """Store multiple sensor readings efficiently"""
+        """Store multiple sensor readings with ALL 30 OBD parameters"""
         if not self.is_connected or not sensor_readings:
             return False
             
         try:
-            # Prepare batch data
+            # Prepare batch data with ALL parameters
             batch_data = []
             for reading in sensor_readings:
                 sensor_record = {
                     'vehicle_id': vehicle_id,
                     'session_id': reading.get('session_id', 'direct_upload'),
                     'timestamp': reading.get('timestamp', datetime.now(timezone.utc).isoformat()),
+                    
+                    # Core Engine (8)
                     'rpm': reading.get('rpm', 0),
-                    'vehicle_speed': reading.get('vehicle_speed') or reading.get('speed', 0),
+                    'vehicle_speed': reading.get('speed', 0),
                     'coolant_temp': reading.get('coolant_temp', 0),
                     'engine_load': reading.get('engine_load', 0),
-                    'throttle_pos': reading.get('throttle_pos', 0),
+                    'intake_temp': reading.get('intake_temp', 0),
+                    'timing_advance': reading.get('timing_advance', 0),
+                    'run_time': int(reading.get('run_time', 0)),
+                    'absolute_load': reading.get('absolute_load', 0),
+                    
+                    # Fuel System (7)
                     'fuel_level': reading.get('fuel_level', 0),
+                    'fuel_pressure': reading.get('fuel_pressure', 0),
+                    'throttle_pos': reading.get('throttle_pos', 0),
+                    'fuel_trim_short': reading.get('short_fuel_trim_1', 0),
+                    'fuel_trim_long': reading.get('long_fuel_trim_1', 0),
+                    'short_fuel_trim_2': reading.get('short_fuel_trim_2', 0),
+                    'long_fuel_trim_2': reading.get('long_fuel_trim_2', 0),
+                    
+                    # Air Intake (3)
+                    'maf': reading.get('maf', 0),
+                    'map': reading.get('intake_pressure', 0),
+                    'barometric_pressure': reading.get('barometric_pressure', 0),
+                    
+                    # Emissions (3)
+                    'o2_sensor_1': reading.get('o2_b1s1', 0),
+                    'o2_b1s2': reading.get('o2_b1s2', 0),
+                    'catalyst_temp_b1s1': reading.get('catalyst_temp_b1s1', 0),
+                    
+                    # Environmental (1)
+                    # 'ambient_air_temp': reading.get('ambient_air_temp', 0),  # Not in Supabase schema
+                    
+                    # Electrical (1)
+                    'control_module_voltage': reading.get('control_module_voltage', 0),
+                    
+                    # Diagnostic (5)
+                    'distance_w_mil': reading.get('distance_w_mil', 0),
+                    'dtc_count': reading.get('dtc_count', 0),
+                    'mil_status': reading.get('mil_status', False),
+                    'fuel_status': reading.get('fuel_status', 'Unknown'),
+                    
+                    # ML Training (2)
+                    'health_status': reading.get('health_status', 0),
+                    'engine_stress_score': reading.get('engine_stress_score', 0),
+                'load_rpm_ratio': reading.get('load_rpm_ratio'),
+                'temp_gradient': reading.get('temp_gradient'),
+                'fuel_efficiency': reading.get('fuel_efficiency'),
+                    
+                    # Metadata
+                    'data_quality_score': reading.get('data_quality', 90),
+                    'status': reading.get('status', 'NORMAL')
                 }
                 batch_data.append(sensor_record)
+            
+            # DEBUG: Log first record before insert
+            if batch_data and len(batch_data) > 0:
+                first_rec = batch_data[0]
+                logger.info(f"DEBUG STORAGE: timing_advance={first_rec.get('timing_advance')}, run_time={first_rec.get('run_time')}, control_module_voltage={first_rec.get('control_module_voltage')}")
+            
+            # DEBUG: Log first record before insert
+            if batch_data and len(batch_data) > 0:
+                first_rec = batch_data[0]
+                logger.info(f"DEBUG STORAGE: timing_advance={first_rec.get('timing_advance')}, run_time={first_rec.get('run_time')}, control_module_voltage={first_rec.get('control_module_voltage')}")
             
             # Insert batch data
             result = self.supabase_client.table('sensor_data').insert(batch_data).execute()
@@ -157,11 +213,14 @@ class SupabaseDirectStorage:
                 'vehicle_id': vehicle_id,
                 'timestamp': latest_reading.get('timestamp', datetime.now(timezone.utc).isoformat()),
                 'rpm': latest_reading.get('rpm', 0),
-                'speed': latest_reading.get('speed', 0),
-                'coolant_temp': latest_reading.get('coolant_temp', 0),
-                'engine_load': latest_reading.get('engine_load', 0),
-                'throttle_pos': latest_reading.get('throttle_pos', 0),
-                'fuel_level': latest_reading.get('fuel_level', 0),
+                'speed_mph': latest_reading.get('speed', 0),
+                'coolant_temp_c': latest_reading.get('coolant_temp', 0),
+                'engine_load_pct': latest_reading.get('engine_load', 0),
+                'throttle_position_pct': latest_reading.get('throttle_pos', 0),
+                'fuel_level_pct': latest_reading.get('fuel_level', 0),
+                'data_quality_score': latest_reading.get('data_quality', 90),
+                'engine_stress_score': latest_reading.get('engine_stress_score', 0),
+                'engine_stress_score': latest_reading.get('engine_stress_score', 0)
             }
             
             # Upsert (insert or update if exists)

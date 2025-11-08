@@ -61,10 +61,6 @@ class ProfessionalCloudCollector:
             'start_time': None
         }
         
-        # State tracking for calculated features
-        self.prev_temp = None
-        self.prev_temp_time = None
-        
         # Validate cloud storage
         if not CLOUD_STORAGE_AVAILABLE or not supabase_storage.is_connected:
             logger.error("❌ Cloud storage not available")
@@ -92,8 +88,8 @@ class ProfessionalCloudCollector:
         """Connect to OBD-II adapter with retries"""
         logger.info("🔌 Connecting to OBD-II adapter...")
         
-        # Try USB/Bluetooth ports (USB first for stability)
-        ports = ['/dev/ttyACM0', '/dev/ttyUSB0', '/dev/ttyUSB1', '/dev/rfcomm0']
+        # Try Bluetooth/USB ports
+        ports = ['/dev/rfcomm0', '/dev/ttyUSB0', '/dev/ttyUSB1']
         
         for attempt in range(1, max_attempts + 1):
             for port in ports:
@@ -276,8 +272,6 @@ class ProfessionalCloudCollector:
                     if not response.is_null():
                         value = response.value.magnitude if hasattr(response.value, 'magnitude') else float(response.value)
                         data[key] = value
-                        if key in ["timing_advance", "run_time", "control_module_voltage", "o2_b1s2"]:
-                            logger.info(f"DEBUG: Read {key} = {value}")
                         successful_reads += 1
                 except Exception as e:
                     logger.debug(f"Failed {key}: {e}")
@@ -307,43 +301,7 @@ class ProfessionalCloudCollector:
             data['fuel_status'] = 'Unknown'
         
         # AUTO-LABEL HEALTH STATUS
-        data['health_status'], data['engine_stress_score'] = self._auto_label_health(data)
-
-        # ========================================
-        # CALCULATED/ENGINEERED FEATURES
-        # ========================================
-        
-        # 1. Load/RPM Ratio - measures engine efficiency
-        if data.get('rpm') and data['rpm'] > 0:
-            data['load_rpm_ratio'] = (data.get('engine_load', 0) / data['rpm']) * 1000
-        else:
-            data['load_rpm_ratio'] = None
-        
-        # 2. Temperature Gradient - detects overheating trends (°C/minute)
-        current_temp = data.get('coolant_temp')
-        import time as time_module
-        current_time = time_module.time()
-        if current_temp is not None and self.prev_temp is not None and self.prev_temp_time is not None:
-            time_delta_minutes = (current_time - self.prev_temp_time) / 60.0
-            if time_delta_minutes > 0:
-                data['temp_gradient'] = (current_temp - self.prev_temp) / time_delta_minutes
-            else:
-                data['temp_gradient'] = 0
-        else:
-            data['temp_gradient'] = None
-        # Update previous temperature for next calculation
-        self.prev_temp = current_temp
-        self.prev_temp_time = current_time
-        
-        # 3. Fuel Efficiency - computed L/100km (requires MAF sensor)
-        maf = data.get('maf')  # Mass Air Flow in g/s
-        speed = data.get('speed')  # Speed in km/h
-        if maf is not None and speed is not None and speed > 0:
-            # Formula: MAF (g/s) × fuel_density (0.75 kg/L) / speed (km/h) / 3600 × 100
-            # Simplified: (maf / 1000) / 0.75 / speed × 3600 × 100
-            data['fuel_efficiency'] = (maf / 1000 / 0.75 / speed * 3600 * 100)
-        else:
-            data['fuel_efficiency'] = None
+        data['health_status'] = self._auto_label_health(data)
         
         # Quality score
         total = len(obd_commands) + 3
@@ -355,106 +313,37 @@ class ProfessionalCloudCollector:
         return data if successful_reads > 0 else None
     
     def _auto_label_health(self, data):
-        """Enhanced auto-label with engine stress analysis
+        """Auto-label: 0=NORMAL, 1=ADVISORY, 2=WARNING, 3=CRITICAL"""
         
-        Uses multi-factor risk scoring based on:
-        - Engine mechanical stress (load, RPM, temperature)
-        - Electrical system health (voltage)
-        - Emissions system (O2, catalyst, fuel trim)
-        - Diagnostic codes and MIL status
+        # CRITICAL (3)
+        if (data.get('coolant_temp', 0) > 110 or
+            data.get('fuel_level', 100) < 3 or
+            data.get('control_module_voltage', 14) < 11 or
+            data.get('dtc_count', 0) > 10 or
+            data.get('catalyst_temp_b1s1', 0) > 900):
+            return 3
         
-        NOTE: fuel_level removed (unsupported by Toyota Veloz OBD)
-        """
+        # WARNING (2)
+        if (data.get('coolant_temp', 0) > 100 or
+            data.get('fuel_level', 100) < 10 or
+            data.get('control_module_voltage', 14) < 12 or
+            data.get('dtc_count', 0) >= 3 or
+            abs(data.get('short_fuel_trim_1', 0)) > 20 or
+            data.get('mil_status', False) or
+            data.get('distance_w_mil', 0) > 50):
+            return 2
         
-        # === CRITICAL (3) - Immediate action required ===
-        # Severe conditions that can cause engine damage
-        if (data.get('coolant_temp', 0) > 110 or              # Severe overheating
-            data.get('control_module_voltage', 14) < 11 or     # Battery dying
-            data.get('dtc_count', 0) > 10 or                   # Many error codes
-            data.get('catalyst_temp_b1s1', 0) > 900 or         # Cat converter failing
-            data.get('engine_load', 0) > 95):                  # Extreme engine stress
-            return 3, 15  # CRITICAL status, max stress score, 15  # CRITICAL status, max stress score
+        # ADVISORY (1)
+        if (data.get('coolant_temp', 0) > 95 or
+            data.get('fuel_level', 100) < 25 or
+            data.get('control_module_voltage', 14) < 13 or
+            data.get('dtc_count', 0) >= 1 or
+            abs(data.get('long_fuel_trim_1', 0)) > 10 or
+            abs(data.get('o2_b1s1', 0.45) - 0.45) > 0.3 or
+            data.get('catalyst_temp_b1s1', 0) > 750):
+            return 1
         
-        # === Engine Stress Score Calculation ===
-        # Multi-factor analysis for nuanced health assessment
-        stress_score = 0
-        
-        # 1. Engine Load Analysis (most important for wear prediction)
-        engine_load = data.get('engine_load', 0)
-        if engine_load > 85:
-            stress_score += 3  # Very high load (highway, uphill, towing)
-        elif engine_load > 70:
-            stress_score += 2  # High load (acceleration, climbing)
-        elif engine_load > 50:
-            stress_score += 1  # Moderate load (normal driving)
-        # < 50% = no stress points (idle, coasting)
-        
-        # 2. RPM vs Load Mismatch (inefficient operation)
-        rpm = data.get('rpm', 0)
-        if rpm > 3500 and engine_load < 30:
-            stress_score += 2  # High RPM but low load = inefficient (revving, wrong gear)
-        elif rpm > 4500:
-            stress_score += 2  # Very high RPM = engine stress
-        
-        # 3. Temperature Stress
-        coolant_temp = data.get('coolant_temp', 0)
-        if coolant_temp > 105:
-            stress_score += 3  # Near critical temp
-        elif coolant_temp > 100:
-            stress_score += 2  # Running hot
-        elif coolant_temp > 95:
-            stress_score += 1  # Warm but manageable
-        
-        # 4. Voltage Issues (electrical stress)
-        voltage = data.get('control_module_voltage', 14)
-        if voltage < 12:
-            stress_score += 2  # Low voltage = alternator/battery issue
-        elif voltage < 13:
-            stress_score += 1  # Slightly low
-        elif voltage > 15:
-            stress_score += 2  # Overcharging = regulator issue
-        
-        # 5. Fuel Trim Analysis (combustion efficiency)
-        short_trim = abs(data.get('short_fuel_trim_1', 0))
-        long_trim = abs(data.get('long_fuel_trim_1', 0))
-        if short_trim > 20 or long_trim > 15:
-            stress_score += 2  # Significant fuel correction needed
-        elif short_trim > 10 or long_trim > 8:
-            stress_score += 1  # Minor corrections
-        
-        # 6. O2 Sensor Health (emissions system)
-        o2_voltage = data.get('o2_b1s1', 0.45)
-        o2_deviation = abs(o2_voltage - 0.45)
-        if o2_deviation > 0.3:
-            stress_score += 1  # O2 sensor or mixture issue
-        
-        # 7. Diagnostic Codes
-        dtc_count = data.get('dtc_count', 0)
-        if dtc_count >= 3:
-            stress_score += 2
-        elif dtc_count >= 1:
-            stress_score += 1
-        
-        # 8. MIL Status (Check Engine Light)
-        if data.get('mil_status', False):
-            stress_score += 2
-        
-        # 9. Distance with MIL on (ignoring problem)
-        if data.get('distance_w_mil', 0) > 50:
-            stress_score += 1
-        
-        # === Risk Classification Based on Total Score ===
-        # WARNING (2) - Needs attention soon (score 6-9)
-        if stress_score >= 6:
-            return 2, stress_score  # WARNING, stress_score  # WARNING
-        
-        # ADVISORY (1) - Monitor closely (score 3-5)
-        elif stress_score >= 3:
-            return 1, stress_score  # ADVISORY, stress_score  # ADVISORY
-        
-        # NORMAL (0) - All systems OK (score 0-2)
-        else:
-            return 0, stress_score  # NORMAL, stress_score  # NORMAL
+        return 0  # NORMAL
     
     def data_collection_loop(self):
         """Main data collection loop with professional logging"""
@@ -501,21 +390,8 @@ class ProfessionalCloudCollector:
                     self.session_stats['errors'] += 1
                     
                     if consecutive_errors >= max_errors:
-                        logger.warning(f"WARNING: Too many consecutive errors ({consecutive_errors}), attempting reconnect...")
-                        # Try to reconnect instead of stopping
-                        if self.connection:
-                            try:
-                                self.connection.close()
-                            except:
-                                pass
-                        
-                        time.sleep(10)  # Wait before reconnecting
-                        if self.connect_obd():
-                            logger.info("RECONNECTED: Connection restored!")
-                            consecutive_errors = 0  # Reset counter
-                        else:
-                            logger.error("RECONNECT FAILED: Will retry in 30 seconds...")
-                            time.sleep(30)
+                        logger.error(f"❌ Too many consecutive errors ({consecutive_errors}), stopping")
+                        break
                 
                 time.sleep(self.collection_interval)
                 
@@ -543,12 +419,6 @@ class ProfessionalCloudCollector:
         
         try:
             batch_data = list(self.data_buffer)
-            
-            # DEBUG: Check first record
-            if batch_data:
-                first = batch_data[0]
-                logger.info(f"DEBUG UPLOAD: First record has {len(first)} fields")
-                logger.info(f"DEBUG UPLOAD: timing_advance={first.get('timing_advance')}, run_time={first.get('run_time')}, control_module_voltage={first.get('control_module_voltage')}")
             
             # Store to sensor_data table
             success = supabase_storage.store_sensor_data_batch(
