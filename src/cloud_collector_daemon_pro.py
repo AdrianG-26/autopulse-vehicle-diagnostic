@@ -88,12 +88,12 @@ class ProfessionalCloudCollector:
         self.stop_collection()
         sys.exit(0)
     
-    def connect_obd(self, max_attempts=5):
+    def connect_obd(self, max_attempts=3):
         """Connect to OBD-II adapter with retries"""
         logger.info("🔌 Connecting to OBD-II adapter...")
         
         # Try USB/Bluetooth ports (USB first for stability)
-        ports = ['/dev/ttyACM0', '/dev/ttyUSB0', '/dev/ttyUSB1', '/dev/rfcomm0']
+        ports = ['/dev/rfcomm0', '/dev/ttyACM0', '/dev/ttyUSB0', '/dev/ttyUSB1']  # Bluetooth first, then USB
         
         for attempt in range(1, max_attempts + 1):
             for port in ports:
@@ -106,7 +106,8 @@ class ProfessionalCloudCollector:
                     self.connection = obd.OBD(port, fast=False, timeout=10)
                     
                     if self.connection.is_connected():
-                        logger.info(f"✅ Connected to OBD-II on {port}")
+                        scanner_type = "Bluetooth OBD" if "rfcomm" in port else "USB OBD"
+                        logger.info(f"✅ Connected to OBD-II on {port} ({scanner_type})")
                         self.supported_commands = set(self.connection.supported_commands)
                         logger.info(f"   Supported commands: {len(self.supported_commands)}")
                         return True
