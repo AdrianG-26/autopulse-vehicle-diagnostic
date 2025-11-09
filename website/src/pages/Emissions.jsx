@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import sensorDataService from "../services/sensorData";
 import DonutProgress from "../components/DonutProgress";
-import StatusIndicator from "../components/StatusIndicator";
 
 export default function Emissions({ onNavigate }) {
   const [sensorData, setSensorData] = useState(null);
@@ -50,13 +49,12 @@ export default function Emissions({ onNavigate }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
           <div>
             <h1 style={{ fontSize: "2rem", fontWeight: "bold", color: "#111827", marginBottom: "0.5rem" }}>
-              🌿 Emissions Monitoring
+              ≡ƒî┐ Emissions Monitoring
             </h1>
             <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-              Real-time emissions system diagnostics and oxygen sensor monitoring
+              Real-time emissions system diagnostics and oxygen sensor monitoring ΓÇó Status: {pollingStatus}
             </p>
           </div>
-          <StatusIndicator status={pollingStatus} />
         </div>
 
         {/* Key Metrics */}
@@ -95,7 +93,7 @@ export default function Emissions({ onNavigate }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem", marginBottom: "1.5rem" }}>
           <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-              🔋 Oxygen Sensor 1
+              ≡ƒöï Oxygen Sensor 1
             </h3>
             <div style={{ display: "grid", gap: "1rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
@@ -126,16 +124,16 @@ export default function Emissions({ onNavigate }) {
 
           <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-              🌡️ Temperature Monitoring
+              ≡ƒîí∩╕Å Temperature Monitoring
             </h3>
             <div style={{ display: "grid", gap: "1rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Coolant Temperature</span>
-                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.coolantTemp, 1)}°C</span>
+                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.coolantTemp, 1)}┬░C</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Intake Air Temperature</span>
-                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.intakeTemp, 1)}°C</span>
+                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.intakeTemp, 1)}┬░C</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Temperature Gradient</span>
@@ -148,7 +146,7 @@ export default function Emissions({ onNavigate }) {
         {/* Engine Metrics */}
         <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", marginBottom: "1.5rem" }}>
           <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-            🔍 Engine Performance
+            ≡ƒöì Engine Performance
           </h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
             <div>

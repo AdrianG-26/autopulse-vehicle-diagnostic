@@ -1,5 +1,4 @@
-import React from 'react';
-import LoginBranding from '../components/LoginBranding';
+﻿import React from 'react';
 import LoginFormSimple from '../components/LoginFormSimple';
 import { isSupabaseConfigured, signupUser, loginUser } from '../services/supabase';
 
@@ -7,12 +6,12 @@ export default function Login({ onLoginSuccess }) {
   
   const handleLogin = async (formData) => {
     try {
-      console.log('🔐 Login attempt for:', formData.usernameOrEmail);
+      console.log('≡ƒöÉ Login attempt for:', formData.usernameOrEmail);
       let authData;
       
       if (isSupabaseConfigured()) {
         authData = await loginUser({ usernameOrEmail: formData.usernameOrEmail, password: formData.password });
-        console.log('✅ Login successful, authData:', authData);
+        console.log('Γ£à Login successful, authData:', authData);
       } else {
         // Fallback to localStorage
         const existingUsers = JSON.parse(localStorage.getItem('autopulse_users') || '[]');
@@ -26,14 +25,14 @@ export default function Login({ onLoginSuccess }) {
       
       // Call success callback
       if (onLoginSuccess && authData) {
-        console.log('✅ Calling onLoginSuccess with:', authData);
+        console.log('Γ£à Calling onLoginSuccess with:', authData);
         onLoginSuccess(authData);
       } else {
-        console.error('❌ onLoginSuccess callback not available or authData missing');
+        console.error('Γ¥î onLoginSuccess callback not available or authData missing');
         throw new Error('Login succeeded but failed to initialize session');
       }
     } catch (error) {
-      console.error('❌ Login failed:', error);
+      console.error('Γ¥î Login failed:', error);
       throw error;
     }
   };
@@ -69,7 +68,20 @@ export default function Login({ onLoginSuccess }) {
   return (
     <div className="login-page">
       <div className="login-container">
-        <LoginBranding />
+        {/* Top Header - Blue Background */}
+        <div className="login-branding">
+          <div className="branding-content">
+            <div style={{ fontSize: '48px', marginBottom: '0.5rem' }}>
+              ≡ƒÜù
+            </div>
+            <h1 className="branding-title">AutoPulse</h1>
+            <p className="branding-tagline">
+              Vehicle Diagnostic System
+            </p>
+          </div>
+        </div>
+        
+        {/* Login Form */}
         <LoginFormSimple 
           onLogin={handleLogin}
           onSignup={handleSignup}

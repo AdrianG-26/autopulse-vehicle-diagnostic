@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
-import Contact from "./pages/Contact";
 import Dashboard from "./pages/Dashboard";
 import Emissions from "./pages/Emissions";
 import Engine from "./pages/Engine";
 import Fuel from "./pages/Fuel";
 import Login from "./pages/Login";
-import Logs from "./pages/Logs";
-import Settings from "./pages/Settings";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [tab, setTab] = useState("Dashboard");
@@ -37,10 +34,10 @@ function App() {
   // No global polling service needed - each page subscribes directly to Supabase
 
   const handleLoginSuccess = (authData) => {
-    console.log('🎉 handleLoginSuccess called with:', authData);
+    console.log('≡ƒÄë handleLoginSuccess called with:', authData);
     
     if (!authData) {
-      console.error('❌ handleLoginSuccess: authData is null/undefined');
+      console.error('Γ¥î handleLoginSuccess: authData is null/undefined');
       return;
     }
     
@@ -53,12 +50,12 @@ function App() {
       loginTime: Date.now(),
     };
     
-    console.log('💾 Saving to localStorage:', authPayload);
+    console.log('≡ƒÆ╛ Saving to localStorage:', authPayload);
     localStorage.setItem("autopulse_auth", JSON.stringify(authPayload));
     
     // Update authentication state - this will trigger re-render and show dashboard
     setIsAuthenticated(true);
-    console.log('✅ Authentication state updated to true');
+    console.log('Γ£à Authentication state updated to true');
   };
 
   const handleLogout = () => {
@@ -77,9 +74,6 @@ function App() {
     if (tab === "Engine") return <Engine onNavigate={setTab} />;
     if (tab === "Fuel") return <Fuel onNavigate={setTab} />;
     if (tab === "Emissions") return <Emissions onNavigate={setTab} />;
-    if (tab === "Contact") return <Contact onNavigate={setTab} />;
-    if (tab === "Logs") return <Logs onNavigate={setTab} />;
-    if (tab === "Settings") return <Settings onNavigate={setTab} />;
     return <Dashboard onNavigate={setTab} />;
   };
 
