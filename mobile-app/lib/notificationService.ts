@@ -1,19 +1,33 @@
 /**
  * Notification Service
  * Handles push notifications for vehicle health status alerts
+ * Note: Notifications are disabled in Expo Go - use a development build for full support
  */
 
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
-// Configure how notifications are handled when the app is in the foreground
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+// Check if running in Expo Go
+const isExpoGo = Constants.appOwnership === 'expo';
+
+// Dynamically import Notifications only when NOT in Expo Go to avoid initialization errors
+let Notifications: any = null;
+
+// Only import and configure notifications if NOT in Expo Go
+if (!isExpoGo && Platform.OS !== 'web') {
+  import('expo-notifications').then((NotificationsModule) => {
+    Notifications = NotificationsModule;
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
+  }).catch((error) => {
+    console.log('⚠️ Notifications module not available:', error.message);
+  });
+}
 
 class NotificationService {
   private hasPermission: boolean = false;
@@ -27,7 +41,17 @@ class NotificationService {
       return false;
     }
 
+    if (isExpoGo) {
+      console.log('⚠️ Notifications not supported in Expo Go - notifications will be simulated in console');
+      return false;
+    }
+
     try {
+      if (!Notifications) {
+        console.log('⚠️ Notifications module not loaded');
+        return false;
+      }
+
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
 
@@ -70,12 +94,29 @@ class NotificationService {
     status: number,
     statusText: string
   ): Promise<void> {
+    // Simulate notification in Expo Go (log to console)
+    if (isExpoGo) {
+      const emoji = status === 2 ? '⚠️' : '🚨';
+      const urgency = status === 2 ? 'Warning' : 'CRITICAL';
+      console.log(`\n${emoji} === NOTIFICATION SIMULATION (Expo Go) ===`);
+      console.log(`📱 Title: ${emoji} Vehicle ${urgency}`);
+      console.log(`📝 Body: Your vehicle status is now ${statusText}`);
+      console.log(`🔔 (In production build, this would trigger a real push notification)`);
+      console.log(`=================================\n`);
+      return;
+    }
+
     if (!this.hasPermission) {
       const granted = await this.requestPermissions();
       if (!granted) return;
     }
 
     try {
+      if (!Notifications) {
+        console.log('⚠️ Notifications module not loaded, skipping notification');
+        return;
+      }
+
       let title = '';
       let body = '';
       let priority = Notifications.AndroidNotificationPriority.DEFAULT;
@@ -117,6 +158,8 @@ class NotificationService {
    * Cancel all notifications
    */
   async cancelAllNotifications(): Promise<void> {
+    if (isExpoGo || !Notifications) return;
+    
     try {
       await Notifications.cancelAllScheduledNotificationsAsync();
       console.log('🔕 All notifications cancelled');
@@ -137,15 +180,17 @@ class NotificationService {
 export const notificationService = new NotificationService();
 
 // Export notification listener hooks
-export const addNotificationReceivedListener = (
-  handler: (notification: Notifications.Notification) => void
+export const addNotificationReceivedListener = async (
+  handler: (notification: any) => void
 ) => {
+  if (isExpoGo || !Notifications) return { remove: () => {} };
   return Notifications.addNotificationReceivedListener(handler);
 };
 
-export const addNotificationResponseReceivedListener = (
-  handler: (response: Notifications.NotificationResponse) => void
+export const addNotificationResponseReceivedListener = async (
+  handler: (response: any) => void
 ) => {
+  if (isExpoGo || !Notifications) return { remove: () => {} };
   return Notifications.addNotificationResponseReceivedListener(handler);
 };
 

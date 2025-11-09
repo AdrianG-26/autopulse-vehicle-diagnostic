@@ -30,7 +30,6 @@
       ]
     },
     "notification": {
-      "icon": "./assets/images/notification-icon.png",
       "color": "#0a7ea4",
       "androidMode": "default",
       "androidCollapsedTitle": "AutoPulse Vehicle Alert"
@@ -54,10 +53,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/notification-icon.png",
-          "color": "#0a7ea4",
-          "sounds": ["./assets/sounds/notification.wav"],
-          "mode": "production"
+          "color": "#0a7ea4"
         }
       ]
     ],
