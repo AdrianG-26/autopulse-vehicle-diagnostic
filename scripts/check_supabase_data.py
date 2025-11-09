@@ -158,7 +158,7 @@ def main():
         print("  2. View collector logs:")
         print("     sudo journalctl -u autopulse-collector -n 50")
         print("  3. Check OBD connection:")
-        print("     ls -la /dev/ttyACM* /dev/ttyUSB*")
+        print("     ls -la /dev/rfcomm* /dev/ttyUSB*")
         print("  4. Restart collector:")
         print("     sudo systemctl restart autopulse-collector")
     

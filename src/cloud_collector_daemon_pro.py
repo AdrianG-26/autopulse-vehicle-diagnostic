@@ -16,7 +16,7 @@ from collections import deque
 import hashlib
 
 # Add parent directory for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
+sys.path.insert(0, os.path.dirname(__file__))
 
 # Import cloud storage
 try:
