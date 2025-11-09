@@ -8,42 +8,162 @@ export default function LoginFormSimple({ onLogin, onSignup }) {
     password: '',
     confirmPassword: ''
   });
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
+
+  // Validation functions
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateField = (name, value) => {
+    const newErrors = { ...errors };
+    
+    switch (name) {
+      case "username":
+        if (!value) {
+          newErrors.username = "Username is required";
+        } else if (value.length < 3) {
+          newErrors.username = "Username must be at least 3 characters";
+        } else {
+          delete newErrors.username;
+        }
+        break;
+      case "email":
+        if (!value) {
+          newErrors.email = "Email is required";
+        } else if (!validateEmail(value)) {
+          newErrors.email = "Please enter a valid email address";
+        } else {
+          delete newErrors.email;
+        }
+        break;
+      case "password":
+        if (!value) {
+          newErrors.password = "Password is required";
+        } else if (value.length < 6) {
+          newErrors.password = "Password must be at least 6 characters";
+        } else {
+          delete newErrors.password;
+        }
+        // Re-validate confirm password if it's been touched
+        if (touched.confirmPassword && formData.confirmPassword) {
+          if (value !== formData.confirmPassword) {
+            newErrors.confirmPassword = "Passwords do not match";
+          } else {
+            delete newErrors.confirmPassword;
+          }
+        }
+        break;
+      case "confirmPassword":
+        if (!value) {
+          newErrors.confirmPassword = "Please confirm your password";
+        } else if (value !== formData.password) {
+          newErrors.confirmPassword = "Passwords do not match";
+        } else {
+          delete newErrors.confirmPassword;
+        }
+        break;
+      default:
+        break;
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleBlur = (fieldName) => {
+    setTouched({ ...touched, [fieldName]: true });
+    validateField(fieldName, formData[fieldName]);
+  };
+
+  const handleChange = (fieldName, value) => {
+    setFormData({ ...formData, [fieldName]: value });
+    if (touched[fieldName]) {
+      validateField(fieldName, value);
+    }
+    // If changing password, also validate confirm password if it's been touched
+    if (fieldName === "password" && touched.confirmPassword) {
+      validateField("confirmPassword", formData.confirmPassword);
+    }
+  };
+
+  const validateForm = () => {
+    const allTouched = {};
+    if (isSignup) {
+      allTouched.username = true;
+      allTouched.email = true;
+      allTouched.password = true;
+      allTouched.confirmPassword = true;
+    } else {
+      allTouched.username = true;
+      allTouched.password = true;
+    }
+    setTouched(allTouched);
+
+    let isValid = true;
+    if (isSignup) {
+      isValid = validateField("username", formData.username) && isValid;
+      isValid = validateField("email", formData.email) && isValid;
+      isValid = validateField("password", formData.password) && isValid;
+      isValid = validateField("confirmPassword", formData.confirmPassword) && isValid;
+    } else {
+      // For login, only check if fields are filled (not validation rules)
+      isValid = formData.username && formData.username.trim().length > 0 && isValid;
+      isValid = formData.password && formData.password.trim().length > 0 && isValid;
+    }
+
+    return isValid;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    
+    // Clear previous errors immediately
+    setErrors({});
+    
+    // Basic validation - just check if fields are filled
+    if (!formData.username || !formData.password) {
+      setErrors({ general: 'Please enter username/email and password' });
+      return;
+    }
+
+    // For signup, do full validation
+    if (isSignup && !validateForm()) {
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isSignup) {
-        // Simple validation for signup
-        if (!formData.username || !formData.email || !formData.password) {
-          throw new Error('Please fill in all fields');
-        }
-        if (formData.password !== formData.confirmPassword) {
-          throw new Error('Passwords do not match');
-        }
-        if (formData.password.length < 6) {
-          throw new Error('Password must be at least 6 characters');
-        }
-        
         await onSignup(formData);
         alert('Account created! Please log in.');
         setIsSignup(false);
-        setFormData({ ...formData, password: '', confirmPassword: '' });
+        setFormData({ username: '', email: '', password: '', confirmPassword: '' });
+        setErrors({});
+        setTouched({});
+        setLoading(false);
       } else {
-        // Simple validation for login
-        if (!formData.username || !formData.password) {
-          throw new Error('Please enter username/email and password');
-        }
-        
+        // Clear any previous errors before attempting login
+        setErrors({});
         await onLogin({ usernameOrEmail: formData.username, password: formData.password });
+        // Login successful - the onLoginSuccess callback will handle navigation
+        // Clear form state
+        setFormData({ username: '', password: '' });
+        setErrors({});
+        setTouched({});
+        // Don't set loading to false here - let navigation happen
+        // If navigation fails, the error handler will catch it
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong');
+      console.error('Login/Signup error:', err);
+      setErrors({ general: err.message || 'Something went wrong' });
     } finally {
+      // Always reset loading state, even if login succeeds or fails
+      // This ensures the button is always clickable again after an error
       setLoading(false);
     }
   };
@@ -60,9 +180,9 @@ export default function LoginFormSimple({ onLogin, onSignup }) {
         </p>
       </div>
 
-      {error && (
+      {errors.general && (
         <div className="error-message general-error">
-          {error}
+          {errors.general}
         </div>
       )}
       
@@ -78,10 +198,15 @@ export default function LoginFormSimple({ onLogin, onSignup }) {
               type="text"
               placeholder={isSignup ? "Choose a username" : "Enter username or email"}
               value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              onChange={(e) => handleChange("username", e.target.value)}
+              onBlur={() => handleBlur("username")}
               disabled={loading}
               autoComplete="username"
+              className={touched.username && errors.username ? "input-error" : ""}
             />
+            {touched.username && errors.username && (
+              <div className="field-error">{errors.username}</div>
+            )}
           </div>
         </div>
 
@@ -95,11 +220,16 @@ export default function LoginFormSimple({ onLogin, onSignup }) {
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => handleChange("email", e.target.value)}
+                onBlur={() => handleBlur("email")}
                 disabled={loading}
                 autoComplete="email"
+                className={touched.email && errors.email ? "input-error" : ""}
               />
             </div>
+            {touched.email && errors.email && (
+              <div className="field-error">{errors.email}</div>
+            )}
           </div>
         )}
 
@@ -112,11 +242,16 @@ export default function LoginFormSimple({ onLogin, onSignup }) {
               type="password"
               placeholder="Enter your password"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={(e) => handleChange("password", e.target.value)}
+              onBlur={() => handleBlur("password")}
               disabled={loading}
               autoComplete={isSignup ? "new-password" : "current-password"}
+              className={touched.password && errors.password ? "input-error" : ""}
             />
           </div>
+          {touched.password && errors.password && (
+            <div className="field-error">{errors.password}</div>
+          )}
         </div>
 
         {isSignup && (
@@ -129,15 +264,24 @@ export default function LoginFormSimple({ onLogin, onSignup }) {
                 type="password"
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={(e) => handleChange("confirmPassword", e.target.value)}
+                onBlur={() => handleBlur("confirmPassword")}
                 disabled={loading}
                 autoComplete="new-password"
+                className={touched.confirmPassword && errors.confirmPassword ? "input-error" : ""}
               />
             </div>
+            {touched.confirmPassword && errors.confirmPassword && (
+              <div className="field-error">{errors.confirmPassword}</div>
+            )}
           </div>
         )}
 
-        <button type="submit" className="login-button" disabled={loading}>
+        <button 
+          type="submit" 
+          className="login-button" 
+          disabled={loading || (isSignup && Object.keys(errors).length > 0 && Object.keys(touched).length > 0)}
+        >
           {loading ? (
             <>
               <span className="loading-spinner">⏳</span>
@@ -159,7 +303,8 @@ export default function LoginFormSimple({ onLogin, onSignup }) {
           className="toggle-button"
           onClick={() => {
             setIsSignup(!isSignup);
-            setError('');
+            setErrors({});
+            setTouched({});
             setFormData({ username: '', email: '', password: '', confirmPassword: '' });
           }}
           disabled={loading}

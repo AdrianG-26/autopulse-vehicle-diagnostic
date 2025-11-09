@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { vehicleMLService } from "../services/vehicleML";
+import sensorDataService from "../services/sensorData";
 
 export default function MLHealthCard({ sensorData, style = {} }) {
   const [healthData, setHealthData] = useState({
@@ -11,60 +12,104 @@ export default function MLHealthCard({ sensorData, style = {} }) {
     lastUpdate: null,
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [autoUpdate, setAutoUpdate] = useState(true);
+  const refreshIntervalRef = useRef(null);
 
-  // Auto-predict when sensor data changes
-  useEffect(() => {
-    if (
-      sensorData &&
-      autoUpdate &&
-      (sensorData.rpm > 0 || sensorData.coolantTemp > 0)
-    ) {
-      predictHealth();
-    }
-  }, [sensorData, autoUpdate]);
-
-  // Check ML API connection on mount
-  useEffect(() => {
-    checkConnection();
-  }, []);
-
-  const predictHealth = async () => {
-    if (!sensorData) return;
-
-    setIsLoading(true);
-    try {
-      const prediction = await vehicleMLService.predictVehicleHealth(
-        sensorData
-      );
-      setHealthData({
-        healthScore: prediction.healthScore,
-        status: prediction.status,
-        alerts: vehicleMLService.formatAlertsForUI(prediction.alerts),
-        confidence: prediction.confidence,
-        isConnected: prediction.success,
-        lastUpdate: Date.now(),
+  // Function to update ML data from sensorData
+  const updateMLData = (data) => {
+    if (data) {
+      // Use ML data directly from Supabase (processed by Raspberry Pi)
+      const mlHealthScore = data.mlHealthScore ?? null;
+      const mlStatus = data.mlStatus || data.status || "UNKNOWN";
+      const mlAlerts = data.mlAlerts || [];
+      const mlConfidence = data.mlConfidence || 0.95;
+      const hasMLData = mlHealthScore !== null && mlHealthScore !== undefined;
+      
+      console.log('🤖 MLHealthCard - Updating ML data:', {
+        mlHealthScore,
+        mlStatus,
+        mlAlertsCount: mlAlerts.length,
+        mlConfidence,
+        hasMLData,
+        sensorDataKeys: Object.keys(data),
+        rawMLData: {
+          mlHealthScore: data.mlHealthScore,
+          mlStatus: data.mlStatus,
+          mlAlerts: data.mlAlerts,
+          mlConfidence: data.mlConfidence,
+          healthStatus: data.healthStatus // Check if health_status exists
+        }
       });
-    } catch (error) {
-      console.error("Health prediction failed:", error);
-    } finally {
-      setIsLoading(false);
+      
+      // Debug: Check if ML columns exist in database
+      if (!hasMLData) {
+        console.warn('⚠️ ML Health Score is missing!', {
+          reason: 'ml_health_score column may not exist in database or Raspberry Pi is not writing ML predictions',
+          solution: 'Run ADD_ML_COLUMNS.sql in Supabase SQL Editor to add ML columns',
+          hasHealthStatus: data.healthStatus !== null && data.healthStatus !== undefined,
+          healthStatusValue: data.healthStatus
+        });
+      }
+      
+      setHealthData({
+        healthScore: mlHealthScore,
+        status: hasMLData ? mlStatus : "DISCONNECTED", // Set to DISCONNECTED when no ML data
+        alerts: mlAlerts,
+        confidence: mlConfidence,
+        isConnected: hasMLData,
+        lastUpdate: data.timestamp ? new Date(data.timestamp).getTime() : Date.now(),
+      });
+    } else {
+      // Reset when no sensor data
+      setHealthData({
+        healthScore: null,
+        status: "DISCONNECTED",
+        alerts: [],
+        confidence: 0,
+        isConnected: false,
+        lastUpdate: null,
+      });
     }
   };
 
-  const checkConnection = async () => {
-    const modelInfo = await vehicleMLService.checkConnection();
-    setHealthData((prev) => ({
-      ...prev,
-      isConnected: vehicleMLService.isConnected,
-    }));
-  };
+  // Automatically update ML data from Supabase sensorData in real-time
+  useEffect(() => {
+    updateMLData(sensorData);
+  }, [sensorData]);
 
-  const statusDisplay = vehicleMLService.getStatusDisplay(healthData.status);
-  const healthColor = vehicleMLService.getHealthScoreColor(
-    healthData.healthScore
-  );
+  // Auto-refresh every 3 seconds to ensure data is up-to-date
+  useEffect(() => {
+    const refreshData = async () => {
+      try {
+        const latestData = await sensorDataService.getLatestSensorData(1); // Default vehicle ID
+        if (latestData) {
+          updateMLData(latestData);
+        }
+      } catch (error) {
+        console.error('Auto-refresh error:', error);
+      }
+    };
+
+    // Initial refresh
+    refreshData();
+
+    // Set up interval for auto-refresh every 3 seconds
+    refreshIntervalRef.current = setInterval(refreshData, 3000);
+
+    // Cleanup interval on unmount
+    return () => {
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+      }
+    };
+  }, []); // Empty dependency array - only run once on mount
+
+  // Show disconnected status when not connected, otherwise use actual status
+  const statusDisplay = !healthData.isConnected 
+    ? { text: "Disconnected", color: "#9ca3af", icon: "⏸️" }
+    : vehicleMLService.getStatusDisplay(healthData.status);
+  const healthColor = !healthData.isConnected
+    ? "#9ca3af"
+    : vehicleMLService.getHealthScoreColor(healthData.healthScore);
 
   const cardStyle = {
     padding: "24px",
@@ -123,9 +168,9 @@ export default function MLHealthCard({ sensorData, style = {} }) {
     <div style={cardStyle}>
       {/* Header */}
       <div style={headerStyle}>
-        <h3 style={titleStyle}>🤖 AI Vehicle Health Monitor</h3>
+        <h3 style={titleStyle}>🧠 Random Forest ML (Auto & Real-time)</h3>
         <div style={statusBadgeStyle}>
-          {healthData.isConnected ? "🟢 ML Connected" : "🔴 ML Offline"}
+          {healthData.isConnected ? "🟢 Active" : "🔴 Offline"}
         </div>
       </div>
 
@@ -141,7 +186,7 @@ export default function MLHealthCard({ sensorData, style = {} }) {
               marginBottom: "4px",
             }}
           >
-            {isLoading ? "..." : healthData.healthScore || "N/A"}
+            {healthData.healthScore ?? "N/A"}
             {healthData.healthScore && (
               <span style={{ fontSize: "18px" }}>/100</span>
             )}
@@ -151,13 +196,6 @@ export default function MLHealthCard({ sensorData, style = {} }) {
           >
             Health Score
           </div>
-          {healthData.confidence > 0 && (
-            <div
-              style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}
-            >
-              {(healthData.confidence * 100).toFixed(0)}% confidence
-            </div>
-          )}
         </div>
 
         {/* Status */}
@@ -180,7 +218,7 @@ export default function MLHealthCard({ sensorData, style = {} }) {
           <div
             style={{ fontSize: "14px", color: "#6b7280", fontWeight: "500" }}
           >
-            Vehicle Status
+            Status
           </div>
         </div>
 
@@ -262,7 +300,7 @@ export default function MLHealthCard({ sensorData, style = {} }) {
         </div>
       )}
 
-      {/* Controls */}
+      {/* Real-time Status Footer */}
       <div
         style={{
           display: "flex",
@@ -273,68 +311,33 @@ export default function MLHealthCard({ sensorData, style = {} }) {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <label
+          <div
             style={{
-              fontSize: "14px",
-              color: "#374151",
               display: "flex",
               alignItems: "center",
               gap: "6px",
+              fontSize: "12px",
+              color: healthData.isConnected ? "#10b981" : "#9ca3af",
             }}
           >
-            <input
-              type="checkbox"
-              checked={autoUpdate}
-              onChange={(e) => setAutoUpdate(e.target.checked)}
-              style={{ margin: 0 }}
+            <div
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                backgroundColor: healthData.isConnected ? "#10b981" : "#9ca3af",
+                animation: healthData.isConnected ? "pulse 2s infinite" : "none",
+              }}
             />
-            Auto-predict
-          </label>
-
-          {healthData.lastUpdate && (
-            <span style={{ fontSize: "12px", color: "#9ca3af" }}>
-              Last: {new Date(healthData.lastUpdate).toLocaleTimeString()}
-            </span>
-          )}
+            {healthData.isConnected ? "🔄 Real-time Active" : "⏸️ Waiting for data"}
+          </div>
         </div>
 
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button
-            onClick={checkConnection}
-            disabled={isLoading}
-            style={{
-              padding: "8px 16px",
-              fontSize: "14px",
-              fontWeight: "500",
-              color: "#374151",
-              backgroundColor: "#f9fafb",
-              border: "1px solid #d1d5db",
-              borderRadius: "6px",
-              cursor: "pointer",
-              transition: "all 0.2s",
-            }}
-          >
-            🔄 Check Connection
-          </button>
-
-          <button
-            onClick={predictHealth}
-            disabled={isLoading || !sensorData}
-            style={{
-              padding: "8px 16px",
-              fontSize: "14px",
-              fontWeight: "500",
-              color: "white",
-              backgroundColor: isLoading ? "#9ca3af" : "#3b82f6",
-              border: "none",
-              borderRadius: "6px",
-              cursor: isLoading ? "not-allowed" : "pointer",
-              transition: "all 0.2s",
-            }}
-          >
-            {isLoading ? "🤖 Analyzing..." : "🧠 Predict Health"}
-          </button>
-        </div>
+        {healthData.lastUpdate && (
+          <span style={{ fontSize: "12px", color: "#9ca3af" }}>
+            Updated: {new Date(healthData.lastUpdate).toLocaleTimeString()}
+          </span>
+        )}
       </div>
     </div>
   );

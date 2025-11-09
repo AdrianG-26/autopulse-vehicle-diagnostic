@@ -7,21 +7,33 @@ export default function Login({ onLoginSuccess }) {
   
   const handleLogin = async (formData) => {
     try {
+      console.log('🔐 Login attempt for:', formData.usernameOrEmail);
+      let authData;
+      
       if (isSupabaseConfigured()) {
-        const authData = await loginUser({ usernameOrEmail: formData.usernameOrEmail, password: formData.password });
-        if (onLoginSuccess) onLoginSuccess(authData);
-        return;
+        authData = await loginUser({ usernameOrEmail: formData.usernameOrEmail, password: formData.password });
+        console.log('✅ Login successful, authData:', authData);
+      } else {
+        // Fallback to localStorage
+        const existingUsers = JSON.parse(localStorage.getItem('autopulse_users') || '[]');
+        const user = existingUsers.find(u => 
+          (u.username === formData.usernameOrEmail || u.email === formData.usernameOrEmail) && 
+          u.password === formData.password
+        );
+        if (!user) throw new Error('Invalid credentials');
+        authData = { username: user.username, email: user.email, id: user.id };
       }
-      // Fallback to localStorage
-      const existingUsers = JSON.parse(localStorage.getItem('autopulse_users') || '[]');
-      const user = existingUsers.find(u => 
-        (u.username === formData.usernameOrEmail || u.email === formData.usernameOrEmail) && 
-        u.password === formData.password
-      );
-      if (!user) throw new Error('Invalid credentials');
-      if (onLoginSuccess) onLoginSuccess({ username: user.username, email: user.email });
+      
+      // Call success callback
+      if (onLoginSuccess && authData) {
+        console.log('✅ Calling onLoginSuccess with:', authData);
+        onLoginSuccess(authData);
+      } else {
+        console.error('❌ onLoginSuccess callback not available or authData missing');
+        throw new Error('Login succeeded but failed to initialize session');
+      }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('❌ Login failed:', error);
       throw error;
     }
   };

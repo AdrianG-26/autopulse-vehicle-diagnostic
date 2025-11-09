@@ -9,8 +9,6 @@ import Fuel from "./pages/Fuel";
 import Login from "./pages/Login";
 import Logs from "./pages/Logs";
 import Settings from "./pages/Settings";
-import { startPolling } from "./services/polling";
-
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [tab, setTab] = useState("Dashboard");
@@ -35,39 +33,32 @@ function App() {
     checkAuth();
   }, []);
 
-  // Auto-start polling on app load
-  useEffect(() => {
-    console.log("🚀 Starting data polling...");
-
-    // Start polling with callbacks
-    startPolling(
-      (data) => {
-        // Data callback - could dispatch to global state if needed
-        // For now, pages will subscribe directly via polling service
-        console.log("📊 Received data:", data);
-      },
-      (status, message) => {
-        // Status callback
-        console.log(`📡 Polling status: ${status} - ${message}`);
-      }
-    );
-
-    // Cleanup on unmount (optional - polling continues across navigation)
-    // return () => stopPolling();
-  }, []);
+  // Note: Data fetching is now handled by individual pages using Supabase REST API + Realtime
+  // No global polling service needed - each page subscribes directly to Supabase
 
   const handleLoginSuccess = (authData) => {
+    console.log('🎉 handleLoginSuccess called with:', authData);
+    
+    if (!authData) {
+      console.error('❌ handleLoginSuccess: authData is null/undefined');
+      return;
+    }
+    
     // Save authentication data to localStorage
-    localStorage.setItem(
-      "autopulse_auth",
-      JSON.stringify({
-        username: authData.username,
-        email: authData.email,
-        keepSignedIn: true,
-        loginTime: Date.now(),
-      })
-    );
+    const authPayload = {
+      id: authData.id || null,
+      username: authData.username || null,
+      email: authData.email || null,
+      keepSignedIn: true,
+      loginTime: Date.now(),
+    };
+    
+    console.log('💾 Saving to localStorage:', authPayload);
+    localStorage.setItem("autopulse_auth", JSON.stringify(authPayload));
+    
+    // Update authentication state - this will trigger re-render and show dashboard
     setIsAuthenticated(true);
+    console.log('✅ Authentication state updated to true');
   };
 
   const handleLogout = () => {
@@ -92,9 +83,30 @@ function App() {
     return <Dashboard onNavigate={setTab} />;
   };
 
+  // Get user info from localStorage
+  const getAuthData = () => {
+    try {
+      const savedAuth = localStorage.getItem("autopulse_auth");
+      if (savedAuth) {
+        return JSON.parse(savedAuth);
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  };
+
+  const authData = getAuthData();
+
   return (
     <div className="App">
-      <Navbar active={tab} onChangeTab={setTab} onLogout={handleLogout} />
+      <Navbar 
+        active={tab} 
+        onChangeTab={setTab} 
+        onLogout={handleLogout}
+        userEmail={authData?.email}
+        userId={authData?.id}
+      />
       {renderPage()}
     </div>
   );

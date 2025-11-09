@@ -181,6 +181,29 @@
   display: block;
 }
 
+.general-error {
+  padding: 12px 16px;
+  background: #fef2f2;
+  color: #991b1b;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  border: 1px solid #fecaca;
+}
+
+/* Validation Error Styles */
+.input-error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2 !important;
+}
+
+.field-error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 4px;
+  padding-left: 4px;
+}
+
 .password-header {
   display: flex;
   justify-content: space-between;
@@ -395,6 +418,23 @@
 .logout-btn:hover {
   background: #fef2f2;
   border-color: #dc2626;
+}
+
+.settings-btn {
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
 }
 
 /* Pages */
