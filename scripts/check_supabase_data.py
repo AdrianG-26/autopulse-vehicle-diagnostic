@@ -9,7 +9,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 # Add backend to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'backend'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 try:
     from supabase_direct_storage import supabase_storage
@@ -158,7 +158,7 @@ def main():
         print("  2. View collector logs:")
         print("     sudo journalctl -u autopulse-collector -n 50")
         print("  3. Check OBD connection:")
-        print("     ls -la /dev/rfcomm* /dev/ttyUSB*")
+        print("     ls -la /dev/ttyACM* /dev/ttyUSB*")
         print("  4. Restart collector:")
         print("     sudo systemctl restart autopulse-collector")
     
