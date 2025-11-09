@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { vehicleMLService } from "../services/vehicleML";
 import sensorDataService from "../services/sensorData";
 
@@ -8,7 +8,7 @@ export default function Dashboard({ onNavigate }) {
   const [lastUpdate, setLastUpdate] = useState(null);
 
   useEffect(() => {
-    console.log('≡ƒôè Dashboard - Setting up sensor data subscription');
+    console.log('📊 Dashboard - Setting up sensor data subscription');
     const unsubscribe = sensorDataService.subscribeToSensorData(
       1,
       (data) => {
@@ -37,7 +37,7 @@ export default function Dashboard({ onNavigate }) {
   const hasMLData = mlHealthScore !== null && mlHealthScore !== undefined;
   // vehicleMLService.getStatusDisplay() only formats the display (text/color/icon), doesn't fetch data
   const statusDisplay = !hasMLData 
-    ? { text: "Disconnected", color: "#9ca3af", icon: "ΓÅ╕∩╕Å" }
+    ? { text: "Disconnected", color: "#9ca3af", icon: "⏸️" }
     : vehicleMLService.getStatusDisplay(mlStatus);
   const healthColor = !hasMLData ? "#9ca3af" : vehicleMLService.getHealthScoreColor(mlHealthScore);
 
@@ -71,7 +71,7 @@ export default function Dashboard({ onNavigate }) {
                 Vehicle Dashboard
             </h1>
               <p style={{ fontSize: "0.9rem", color: "#6b7280", margin: 0 }}>
-                Real-time monitoring ΓÇó ML-powered diagnostics
+                Real-time monitoring • ML-powered diagnostics
             </p>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function Dashboard({ onNavigate }) {
                 fontSize: "2.5rem",
                 backdropFilter: "blur(10px)"
               }}>
-                ≡ƒñû
+                🤖
               </div>
               <div>
                 <h2 style={{ fontSize: "1.75rem", fontWeight: "800", color: "#ffffff", margin: 0, marginBottom: "4px" }}>
@@ -140,7 +140,7 @@ export default function Dashboard({ onNavigate }) {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
               >
-                <div style={{ fontSize: "2rem", marginBottom: "12px" }}>≡ƒÆÜ</div>
+                <div style={{ fontSize: "2rem", marginBottom: "12px" }}>❤️</div>
                 <div style={{ fontSize: "0.75rem", color: "rgba(255, 255, 255, 0.8)", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>
                   Health Score
                 </div>
@@ -195,7 +195,7 @@ export default function Dashboard({ onNavigate }) {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
               >
-                <div style={{ fontSize: "2rem", marginBottom: "12px" }}>≡ƒôè</div>
+                <div style={{ fontSize: "2rem", marginBottom: "12px" }}>📊</div>
                 <div style={{ fontSize: "0.75rem", color: "rgba(255, 255, 255, 0.8)", fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "12px" }}>
                   Data Quality
                 </div>
@@ -220,23 +220,23 @@ export default function Dashboard({ onNavigate }) {
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)"
               }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#111827", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span>≡ƒÜù</span> Vehicle Health Status
+                  <span>🚗</span> Vehicle Health Status
                 </h3>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px" }}>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>ΓÜÖ∩╕Å Engine RPM</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>🔧 Engine RPM</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#3b82f6" }}>{fmt(sensorData?.rpm, 0)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>rpm</span></div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒîí∩╕Å Coolant Temp</div>
-                    <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#f59e0b" }}>{fmt(sensorData?.coolantTemp, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>┬░C</span></div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>🌡️ Coolant Temp</div>
+                    <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#f59e0b" }}>{fmt(sensorData?.coolantTemp, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>°C</span></div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒôê Engine Load</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>⚡ Engine Load</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#8b5cf6" }}>{fmt(sensorData?.engineLoad, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>%</span></div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒÄÜ∩╕Å Throttle</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>🎚️ Throttle</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#06b6d4" }}>{fmt(sensorData?.throttlePos, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>%</span></div>
                   </div>
                 </div>
@@ -250,19 +250,19 @@ export default function Dashboard({ onNavigate }) {
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)"
               }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#111827", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span>≡ƒôÉ</span> Performance Metrics
+                  <span>📈</span> Performance Metrics
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>ΓÜû∩╕Å Load/RPM Ratio</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>📐 Load/RPM Ratio</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: "700", color: "#6366f1" }}>{fmt(sensorData?.loadRpmRatio, 3)}</div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒîí∩╕Å Temp Gradient</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>🌡️ Temp Gradient</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: "700", color: "#ec4899" }}>{fmt(sensorData?.tempGradient, 2)}</div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>ΓÜí Engine Stress</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>⚠️ Engine Stress</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: "700", color: "#f59e0b" }}>{fmt(sensorData?.engineStressScore, 2)}</div>
                   </div>
                 </div>
@@ -279,23 +279,23 @@ export default function Dashboard({ onNavigate }) {
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)"
               }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#111827", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span>≡ƒôí</span> Sensor Readings
+                  <span>📡</span> Sensor Readings
                 </h3>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "12px" }}>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒÅâ Speed</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>🚗 Speed</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#10b981" }}>{fmt(sensorData?.vehicleSpeed, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>km/h</span></div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒî¼∩╕Å Intake Temp</div>
-                    <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#06b6d4" }}>{fmt(sensorData?.intakeTemp, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>┬░C</span></div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>🌡️ Intake Temp</div>
+                    <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#06b6d4" }}>{fmt(sensorData?.intakeTemp, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>°C</span></div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>ΓÅ▒∩╕Å Timing</div>
-                    <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#8b5cf6" }}>{fmt(sensorData?.timingAdvance, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>┬░</span></div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>⏱️ Timing</div>
+                    <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#8b5cf6" }}>{fmt(sensorData?.timingAdvance, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>°</span></div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒîì Pressure</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>📊 Pressure</div>
                     <div style={{ fontSize: "1.75rem", fontWeight: "700", color: "#6366f1" }}>{fmt(sensorData?.barometricPressure, 1)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>kPa</span></div>
                   </div>
                 </div>
@@ -309,15 +309,15 @@ export default function Dashboard({ onNavigate }) {
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)"
               }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#111827", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span>Γ¢╜</span> Fuel System
+                  <span>⛽</span> Fuel System
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒôë Short Fuel Trim</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>⛽ Short Fuel Trim</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: "700", color: "#f59e0b" }}>{fmt(sensorData?.fuelTrimShort, 2)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>%</span></div>
                   </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒôè Long Fuel Trim</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>📊 Long Fuel Trim</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: "700", color: "#ec4899" }}>{fmt(sensorData?.fuelTrimLong, 2)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>%</span></div>
                   </div>
             </div>
@@ -334,17 +334,17 @@ export default function Dashboard({ onNavigate }) {
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)"
               }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#111827", marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span>≡ƒöº</span> System Info
+                  <span>🔧</span> System Info
                 </h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>≡ƒöï Voltage</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>⚡ Voltage</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: "700", color: sensorData?.controlModuleVoltage >= 12 ? "#10b981" : "#ef4444" }}>
                       {fmt(sensorData?.controlModuleVoltage, 2)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>V</span>
             </div>
             </div>
                   <div style={{ background: "#f9fafb", borderRadius: "12px", padding: "16px", border: "1px solid #e5e7eb" }}>
-                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>ΓÅ░ Runtime</div>
+                    <div style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: "600", textTransform: "uppercase", marginBottom: "8px" }}>⏱️ Runtime</div>
                     <div style={{ fontSize: "1.5rem", fontWeight: "700", color: "#6366f1" }}>{fmt(sensorData?.engineRuntime, 0)}<span style={{ fontSize: "0.875rem", color: "#6b7280", marginLeft: "4px" }}>s</span></div>
               </div>
             </div>

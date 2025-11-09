@@ -138,7 +138,7 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
     try {
       // Use userId if available, otherwise use email
       const identifier = userId || userEmail;
-      console.log('≡ƒöæ Change password - userId:', userId, 'userEmail:', userEmail, 'identifier:', identifier);
+      console.log('🔑 Change password - userId:', userId, 'userEmail:', userEmail, 'identifier:', identifier);
       
       if (!identifier) {
         throw new Error('User information not available. Please log out and log back in.');
@@ -180,7 +180,7 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
           fontSize: "20px",
         }}
       >
-        ΓÜÖ∩╕Å
+        🔧
       </button>
 
       {/* Dropdown Menu */}
@@ -226,7 +226,7 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
                 onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
                 onMouseLeave={(e) => (e.target.style.backgroundColor = "white")}
               >
-                ≡ƒöæ Change Password
+                🔑 Change Password
               </button>
               <div
                 style={{
@@ -254,7 +254,7 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
                 onMouseEnter={(e) => (e.target.style.backgroundColor = "#fef2f2")}
                 onMouseLeave={(e) => (e.target.style.backgroundColor = "white")}
               >
-                ≡ƒÜ¬ Sign Out
+                🚪 Sign Out
               </button>
             </>
           ) : (
@@ -289,7 +289,7 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
                     color: "#6b7280",
                   }}
                 >
-                  Γ£ò
+                  ✕
                 </button>
               </div>
 

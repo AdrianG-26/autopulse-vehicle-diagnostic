@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import sensorDataService from "../services/sensorData";
 import DonutProgress from "../components/DonutProgress";
 
@@ -51,10 +51,10 @@ export default function Fuel({ onNavigate }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
           <div>
             <h1 style={{ fontSize: "2rem", fontWeight: "bold", color: "#111827", marginBottom: "0.5rem" }}>
-              Γ¢╜ Fuel System
+              ⛽ Fuel System
             </h1>
             <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-              Real-time fuel system monitoring and diagnostics ΓÇó Status: {pollingStatus}
+              Real-time fuel system monitoring and diagnostics • Status: {pollingStatus}
             </p>
           </div>
         </div>
@@ -95,7 +95,7 @@ export default function Fuel({ onNavigate }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem", marginBottom: "1.5rem" }}>
           <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-              Γ¢╜ Fuel Level & Pressure
+              ⛽ Fuel Level & Pressure
             </h3>
             <div style={{ display: "grid", gap: "1rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
@@ -115,7 +115,7 @@ export default function Fuel({ onNavigate }) {
 
           <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-              ≡ƒôè Fuel Trim
+              📊 Fuel Trim
             </h3>
             <div style={{ display: "grid", gap: "1rem" }}>
               <div>
@@ -171,7 +171,7 @@ export default function Fuel({ onNavigate }) {
 
           <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-              ≡ƒôê Fuel Performance
+              ⚡ Fuel Performance
             </h3>
             <div style={{ display: "grid", gap: "1rem" }}>
               {/* Fuel Efficiency removed - has null values in database */}

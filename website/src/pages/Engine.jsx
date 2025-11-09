@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import sensorDataService from "../services/sensorData";
 import DonutProgress from "../components/DonutProgress";
 
@@ -43,10 +43,10 @@ export default function Engine({ onNavigate }) {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
           <div>
             <h1 style={{ fontSize: "2rem", fontWeight: "bold", color: "#111827", marginBottom: "0.5rem" }}>
-              ≡ƒöº Engine Diagnostics
+              🔧 Engine Diagnostics
             </h1>
             <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-              Real-time engine performance monitoring ΓÇó Status: {pollingStatus}
+              Real-time engine performance monitoring • Status: {pollingStatus}
             </p>
           </div>
         </div>
@@ -71,7 +71,7 @@ export default function Engine({ onNavigate }) {
             value={sensorData?.coolantTemp || 0}
             max={120}
             label="Coolant Temp"
-            unit="┬░C"
+            unit="°C"
             color="#f59e0b"
           />
           <DonutProgress
@@ -87,7 +87,7 @@ export default function Engine({ onNavigate }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem", marginBottom: "1.5rem" }}>
           <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-              ΓÜÖ∩╕Å Core Engine Metrics
+              🔧 Core Engine Metrics
             </h3>
             <div style={{ display: "grid", gap: "1rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
@@ -100,7 +100,7 @@ export default function Engine({ onNavigate }) {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Coolant Temperature</span>
-                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.coolantTemp, 1)}┬░C</span>
+                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.coolantTemp, 1)}°C</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Engine Runtime</span>
@@ -113,7 +113,7 @@ export default function Engine({ onNavigate }) {
 
           <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-              ≡ƒÆ¿ Air Intake System
+              💨 Air Intake System
             </h3>
             <div style={{ display: "grid", gap: "1rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
@@ -126,7 +126,7 @@ export default function Engine({ onNavigate }) {
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Intake Air Temperature</span>
-                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.intakeTemp, 1)}┬░C</span>
+                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.intakeTemp, 1)}°C</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Barometric Pressure</span>
@@ -137,12 +137,12 @@ export default function Engine({ onNavigate }) {
 
           <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
             <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-              ΓÜí Ignition & Timing
+              ⚠️ Ignition & Timing
             </h3>
             <div style={{ display: "grid", gap: "1rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Timing Advance</span>
-                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.timingAdvance, 1)}┬░</span>
+                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.timingAdvance, 1)}°</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Throttle Position</span>
@@ -163,7 +163,7 @@ export default function Engine({ onNavigate }) {
         {/* Diagnostics Section */}
         <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
           <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
-            ≡ƒöì Engine Diagnostics
+            ⚙️ Engine Diagnostics
           </h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
             <div>

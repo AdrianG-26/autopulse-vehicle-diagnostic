@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "autopulse",
   "version": "0.1.0",
   "private": true,
@@ -20,7 +20,7 @@
     "eject": "react-scripts eject",
     "clean": "rm -rf node_modules build",
     "fresh-install": "npm run clean && npm install",
-    "analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'",
+    "analyze": "npm run build && npx source-map-explorer build/static/js/*.js",
     "serve": "serve -s build -l 3000"
   },
   "eslintConfig": {
@@ -45,4 +45,3 @@
     "serve": "^14.2.5"
   }
 }
-

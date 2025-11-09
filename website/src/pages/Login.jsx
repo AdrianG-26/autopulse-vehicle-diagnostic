@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import LoginFormSimple from '../components/LoginFormSimple';
 import { signupUser, loginUser } from '../services/supabase';
 
@@ -6,7 +6,7 @@ export default function Login({ onLoginSuccess }) {
   
   const handleLogin = async (formData) => {
     try {
-      console.log('≡ƒöÉ Login attempt for:', formData.usernameOrEmail);
+      console.log('🔐 Login attempt for:', formData.usernameOrEmail);
       
       const authData = await loginUser({ usernameOrEmail: formData.usernameOrEmail, password: formData.password });
       console.log('Γ£à Login successful, authData:', authData);
@@ -41,7 +41,7 @@ export default function Login({ onLoginSuccess }) {
         <div className="login-branding">
           <div className="branding-content">
             <div style={{ fontSize: '48px', marginBottom: '0.5rem' }}>
-              ≡ƒÜù
+              🚗
             </div>
             <h1 className="branding-title">AutoPulse</h1>
             <p className="branding-tagline">
