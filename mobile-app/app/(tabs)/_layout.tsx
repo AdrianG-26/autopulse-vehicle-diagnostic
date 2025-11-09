@@ -82,19 +82,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="log"
-        options={{
-          title: 'Logs',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons 
-              name={focused ? 'list' : 'list-outline'} 
-              size={24} 
-              color={color} 
-            />
-          ),
-        }}
-      />
     </Tabs>
   );
 }

@@ -2,7 +2,7 @@ import { rpiApi, VehicleData } from "@/lib/rpiApi";
 import { useEffect, useState } from "react";
 
 /**
- * Custom hook for accessing real-time vehicle data from Raspberry Pi
+ * Custom hook for accessing vehicle data from Raspberry Pi via REST API
  */
 export function useVehicleData() {
   const [data, setData] = useState<VehicleData | null>(null);
@@ -11,31 +11,16 @@ export function useVehicleData() {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   useEffect(() => {
-    // Subscribe to real-time updates
-    const unsubscribe = rpiApi.subscribe("vehicle-data-hook", (newData) => {
-      setData(newData);
-      setLoading(false);
-      setLastUpdate(new Date());
-
-      if (!newData) {
-        setError("No data available from Raspberry Pi");
-      } else {
-        setError(null);
-      }
-    });
-
-    // Cleanup on unmount
-    return () => {
-      unsubscribe();
-    };
+    // Initial data fetch
+    fetchData();
   }, []);
 
   /**
-   * Manually refresh data (for pull-to-refresh)
+   * Fetch data from REST API
    */
-  const refresh = async () => {
+  const fetchData = async () => {
     setLoading(true);
-    const response = await rpiApi.refresh();
+    const response = await rpiApi.fetchLatest();
     setData(response.data);
     setLoading(false);
     setLastUpdate(new Date());
@@ -45,6 +30,13 @@ export function useVehicleData() {
     } else {
       setError(null);
     }
+  };
+
+  /**
+   * Manually refresh data (for pull-to-refresh)
+   */
+  const refresh = async () => {
+    await fetchData();
   };
 
   return {

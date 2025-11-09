@@ -46,8 +46,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error('Username or email is required');
     }
 
-    if (!password || password.trim().length < 6) {
-      throw new Error('Password must be at least 6 characters');
+    if (!password || password.trim().length < 8) {
+      throw new Error('Password must be at least 8 characters');
     }
 
     try {
@@ -106,8 +106,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error('Email is required');
     }
 
-    if (!password || password.length < 6) {
-      throw new Error('Password must be at least 6 characters');
+    if (!password || password.length < 8) {
+      throw new Error('Password must be at least 8 characters');
     }
 
     try {
@@ -133,12 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       console.log('✅ User created:', data);
-      setUser({
-        id: data.id,
-        email: data.email,
-        username: data.username
-      });
-      setIsAuthenticated(true);
+      // Don't auto-login, let user go to login screen
       return { requiresEmailConfirmation: false };
     } catch (error: any) {
       console.error('❌ Signup failed:', error);

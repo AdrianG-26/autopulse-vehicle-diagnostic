@@ -23,8 +23,8 @@ export default function SignupScreen() {
       Alert.alert('Error', 'Email is required');
       return;
     }
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+    if (password.length < 8) {
+      Alert.alert('Error', 'Password must be at least 8 characters');
       return;
     }
     if (password !== confirmPassword) {
@@ -35,8 +35,16 @@ export default function SignupScreen() {
     try {
       setLoading(true);
       await signUp(username, email, password);
-      Alert.alert('Success', 'Account created successfully!');
-      router.replace('/(tabs)');
+      Alert.alert(
+        'Success', 
+        'Account created successfully! Please log in with your new credentials.',
+        [
+          {
+            text: 'OK',
+            onPress: () => router.replace('/(auth)/login')
+          }
+        ]
+      );
     } catch (error: any) {
       Alert.alert('Sign up failed', error?.message ?? 'Please try again.');
     } finally {
@@ -146,7 +154,7 @@ export default function SignupScreen() {
                   <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9BA1A6" />
                 </Pressable>
               </View>
-              <Text style={styles.passwordHint}>Password must be at least 6 characters</Text>
+              <Text style={styles.passwordHint}>Password must be at least 8 characters</Text>
             </View>
 
             <Pressable

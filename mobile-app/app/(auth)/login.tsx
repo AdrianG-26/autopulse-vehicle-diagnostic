@@ -113,7 +113,7 @@ export default function LoginScreen() {
 									<Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#9BA1A6" />
 								</Pressable>
 							</View>
-							<Text style={styles.passwordHint}>Password must be at least 6 characters</Text>
+							<Text style={styles.passwordHint}>Password must be at least 8 characters</Text>
 						</View>
 
 						<View style={styles.toggleContainer}>

@@ -1,15 +1,13 @@
 /**
- * Raspberry Pi API Service
- * Connects to Flask API running on Raspberry Pi
+ * Vehicle Data API Service
+ * Connects directly to Supabase database for real-time vehicle diagnostics
+ * Data flow: OBD2 → Raspberry Pi → Supabase → Mobile App
  */
 
-// Default to a common Pi IP for local hotspots; can be configured in app settings
-const DEFAULT_API_URL = "http://192.168.1.100:5000"; // Change this to your Raspberry Pi IP
-
-// Persisted setting key
+// Legacy settings (kept for backward compatibility but not used for Supabase connection)
+const DEFAULT_API_URL = "Supabase (Direct Connection)";
 const STORAGE_KEY_API_URL = "@autopulse:rpi_api_url";
 
-// AsyncStorage is used to persist the API URL so the app can switch endpoints at runtime
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface VehicleData {
@@ -57,17 +55,13 @@ interface ApiResponse {
   error?: string;
 }
 
-class RaspberryPiAPI {
-  private apiUrl: string;
-  private subscribers: Map<string, (data: VehicleData | null) => void>;
-  private pollingInterval: ReturnType<typeof setInterval> | null;
-  private isPolling: boolean;
+class VehicleDataAPI {
+  private apiUrl: string; // Legacy field (kept for compatibility)
+  private latestData: VehicleData | null;
 
   constructor(apiUrl: string = DEFAULT_API_URL) {
     this.apiUrl = apiUrl;
-    this.subscribers = new Map();
-    this.pollingInterval = null;
-    this.isPolling = false;
+    this.latestData = null;
   }
 
   /**
@@ -115,101 +109,58 @@ class RaspberryPiAPI {
   }
 
   /**
-   * Fetch latest sensor data from Raspberry Pi
+   * Fetch latest sensor data from Supabase (direct connection)
    */
   async fetchLatest(): Promise<ApiResponse> {
     try {
-      const response = await fetch(`${this.apiUrl}/api/latest`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        // Timeout removed for React Native compatibility
-      });
+      // Import supabase - dynamic import to avoid circular dependencies
+      const { supabase } = await import('./supabase');
+      
+      const { data, error } = await supabase
+        .from('sensor_data')
+        .select('*')
+        .order('timestamp', { ascending: false })
+        .limit(1)
+        .single();
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      if (error) {
+        console.error('Supabase query error:', error);
+        throw error;
       }
 
-      const data: ApiResponse = await response.json();
-      return data;
+      if (!data) {
+        return {
+          success: false,
+          data: null,
+          timestamp: new Date().toISOString(),
+          message: 'No data available yet'
+        };
+      }
+
+      // Store latest data for immediate access
+      this.latestData = data as VehicleData;
+
+      return {
+        success: true,
+        data: data as VehicleData,
+        timestamp: data.timestamp || new Date().toISOString()
+      };
     } catch (error: any) {
-      // console.error("Error fetching latest data:", error);
+      console.error("Error fetching from Supabase:", error);
       return {
         success: false,
         data: null,
         timestamp: new Date().toISOString(),
-        error: error.message || "Failed to connect to Raspberry Pi",
+        error: error.message || "Failed to connect to Supabase",
       };
     }
   }
 
   /**
-   * Subscribe to real-time updates (polling every 1 second)
+   * Get the latest cached data
    */
-  subscribe(
-    id: string,
-    callback: (data: VehicleData | null) => void
-  ): () => void {
-    this.subscribers.set(id, callback);
-
-    // Start polling if not already started
-    if (!this.isPolling) {
-      this.startPolling();
-    }
-
-    // Return unsubscribe function
-    return () => {
-      this.subscribers.delete(id);
-      if (this.subscribers.size === 0) {
-        this.stopPolling();
-      }
-    };
-  }
-
-  /**
-   * Start polling for data
-   */
-  private startPolling(): void {
-    if (this.isPolling) return;
-
-    this.isPolling = true;
-    console.log("🚀 Started polling Raspberry Pi API");
-
-    // Initial fetch
-    this.poll();
-
-    // Poll every 1 second (matching website behavior)
-    this.pollingInterval = setInterval(() => {
-      this.poll();
-    }, 1000);
-  }
-
-  /**
-   * Stop polling
-   */
-  private stopPolling(): void {
-    if (!this.isPolling) return;
-
-    this.isPolling = false;
-    console.log("🛑 Stopped polling Raspberry Pi API");
-
-    if (this.pollingInterval) {
-      clearInterval(this.pollingInterval);
-      this.pollingInterval = null;
-    }
-  }
-
-  /**
-   * Execute poll and notify subscribers
-   */
-  private async poll(): Promise<void> {
-    const response = await this.fetchLatest();
-
-    // Notify all subscribers
-    this.subscribers.forEach((callback) => {
-      callback(response.data);
-    });
+  getLatestData(): VehicleData | null {
+    return this.latestData;
   }
 
   /**
@@ -220,42 +171,38 @@ class RaspberryPiAPI {
   }
 
   /**
-   * Test connection to Raspberry Pi
+   * Test connection to Supabase
    */
   async testConnection(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.apiUrl}/api/latest`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        signal: AbortSignal.timeout(3000),
-      });
+      const { supabase } = await import('./supabase');
+      
+      const { error } = await supabase
+        .from('sensor_data')
+        .select('timestamp')
+        .limit(1);
 
-      return response.ok;
+      return !error;
     } catch (error) {
-      // console.error("Connection test failed:", error);
+      console.error("Supabase connection test failed:", error);
       return false;
     }
   }
 
   /**
-   * Get model information
+   * Get model information (not available with direct Supabase connection)
    */
   async getModelInfo(): Promise<any> {
-    try {
-      const response = await fetch(`${this.apiUrl}/api/model-info`);
-      if (!response.ok) throw new Error("Failed to fetch model info");
-      return await response.json();
-    } catch (error) {
-      // console.error("Error fetching model info:", error);
-      return null;
-    }
+    // Model info not available with direct Supabase connection
+    return {
+      source: 'supabase',
+      note: 'Direct database connection - ML predictions included in sensor data'
+    };
   }
 }
 
 // Export singleton instance
-export const rpiApi = new RaspberryPiAPI();
+export const rpiApi = new VehicleDataAPI();
 
 // Attempt to load persisted API URL on import (non-blocking)
 (async () => {

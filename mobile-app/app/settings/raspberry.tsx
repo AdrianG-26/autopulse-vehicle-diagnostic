@@ -26,7 +26,7 @@ type ConnectionStatus =
 export default function RaspberrySettingsScreen() {
   const [status, setStatus] = useState<ConnectionStatus>("idle");
   const [lastSync, setLastSync] = useState<string | null>(null);
-  const [endpoint, setEndpoint] = useState<string>(rpiApi.getApiUrl());
+  const [endpoint] = useState<string>("Supabase (Direct Connection)");
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const checkConnection = async () => {
@@ -62,7 +62,7 @@ export default function RaspberrySettingsScreen() {
         setStatus("error");
         Alert.alert(
           "Connection Failed",
-          "Could not connect to the Raspberry Pi API. Make sure the server is running and the IP address is correct."
+          "Could not connect to Supabase. Please check your internet connection and ensure the database is accessible."
         );
       }
     } finally {
@@ -108,7 +108,7 @@ export default function RaspberrySettingsScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.panelContainer}>
         <ThemedText type="subtitle" style={styles.panelTitle}>
-          Raspberry Pi Connection
+          Database Connection
         </ThemedText>
         <View style={styles.panelCard}>
           <View style={styles.panelRow}>
@@ -119,7 +119,7 @@ export default function RaspberrySettingsScreen() {
                 color="#0a7ea4"
               />
               <ThemedText style={styles.panelRowLabel}>
-                Connection Status
+                Supabase Status
               </ThemedText>
             </View>
             <View
@@ -139,16 +139,14 @@ export default function RaspberrySettingsScreen() {
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
               <IconSymbol name="link" size={24} color="#0a7ea4" />
-              <ThemedText style={styles.panelRowLabel}>API Endpoint</ThemedText>
+              <ThemedText style={styles.panelRowLabel}>Data Source</ThemedText>
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
               <TextInput
                 value={endpoint}
-                onChangeText={setEndpoint}
-                style={styles.endpointInput}
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="url"
+                style={[styles.endpointInput, styles.endpointReadOnly]}
+                editable={false}
+                selectTextOnFocus={false}
               />
             </View>
           </View>
@@ -192,17 +190,16 @@ export default function RaspberrySettingsScreen() {
                 { flex: 1 },
               ]}
               onPress={async () => {
-                // Save endpoint and persist
-                await rpiApi.setAndPersistApiUrl(endpoint);
+                // Test Supabase connection
                 Alert.alert(
-                  "Saved",
-                  "API endpoint saved. Testing connection..."
+                  "Testing",
+                  "Testing Supabase connection..."
                 );
                 checkConnection();
               }}
             >
-              <Ionicons name="save-outline" size={20} color="#ffffff" />
-              <Text style={styles.buttonText}>Save & Test</Text>
+              <Ionicons name="cloud-done-outline" size={20} color="#ffffff" />
+              <Text style={styles.buttonText}>Test Connection</Text>
             </Pressable>
 
             <Pressable
@@ -210,18 +207,26 @@ export default function RaspberrySettingsScreen() {
                 styles.buttonOutline,
                 pressed && styles.buttonPressed,
               ]}
-              onPress={() => {
-                // Reset input to current rpiApi value
-                setEndpoint(rpiApi.getApiUrl());
-                Alert.alert("Reset", "Endpoint reset to current saved value.");
+              onPress={async () => {
+                // Refresh data
+                try {
+                  const result = await rpiApi.fetchLatest();
+                  if (result.success) {
+                    Alert.alert("Success", "Data refreshed successfully!");
+                  } else {
+                    Alert.alert("Error", result.error || "Failed to refresh data");
+                  }
+                } catch (error: any) {
+                  Alert.alert("Error", error.message || "Failed to refresh data");
+                }
               }}
             >
               <Ionicons
-                name="return-up-back-outline"
+                name="refresh-outline"
                 size={20}
                 color="#0a7ea4"
               />
-              <Text style={[styles.buttonTextOutline]}>Reset</Text>
+              <Text style={[styles.buttonTextOutline]}>Refresh Data</Text>
             </Pressable>
           </View>
         )}
@@ -303,6 +308,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     color: "#1c1b1f",
     letterSpacing: 0.25,
+  },
+  endpointReadOnly: {
+    backgroundColor: "#f5f5f5",
+    color: "#0a7ea4",
+    fontWeight: "600",
   },
   buttonOutline: {
     borderColor: "#0a7ea4",

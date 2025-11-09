@@ -16,17 +16,6 @@ export default function SettingsIndexScreen() {
           <IconSymbol name="person" size={20} color="#0a7ea4" />
           <ThemedText style={styles.tabText}>Profile</ThemedText>
         </Pressable>
-
-        <Pressable
-          style={({ pressed }) => [styles.panelCard, pressed && { opacity: 0.84 }]}
-          onPress={() => router.push('/settings/customer-service')}
-        >
-          <View style={styles.panelRow}>
-            <IconSymbol name="chatbox-ellipses-outline" size={24} color="#0a7ea4" style={styles.panelIcon} />
-            <ThemedText style={styles.panelTitle}>Customer Service</ThemedText>
-          </View>
-          <ThemedText style={styles.subtitle}>Message admin for inquiries and support</ThemedText>
-        </Pressable>
       </View>
     </ScrollView>
   );
@@ -58,39 +47,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: '#123B4A',
-  },
-  panelCard: {
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: '#ffffff',
-    elevation: 2,
-    flexDirection: 'column',
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
-    borderWidth: 1,
-    borderColor: '#E6E9ED',
-  },
-  panelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    marginBottom: 2,
-  },
-  panelIcon: {
-    marginRight: 8,
-  },
-  panelTitle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: '#0a7ea4',
-  },
-  subtitle: {
-    color: '#657889',
-    fontSize: 13,
-    marginTop: 6,
-    marginLeft: 40
   },
 });
 
