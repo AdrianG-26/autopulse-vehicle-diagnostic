@@ -207,13 +207,21 @@ class SupabaseDirectStorage:
         try:
             realtime_data = {
                 'vehicle_id': vehicle_id,
+                'session_id': latest_reading.get('session_id'),
                 'timestamp': latest_reading.get('timestamp', datetime.now(timezone.utc).isoformat()),
                 'rpm': latest_reading.get('rpm', 0),
-                'speed_mph': latest_reading.get('speed', 0),
-                'coolant_temp_c': latest_reading.get('coolant_temp', 0),
-                'engine_load_pct': latest_reading.get('engine_load', 0),
-                'throttle_position_pct': latest_reading.get('throttle_pos', 0),
-                'fuel_level_pct': latest_reading.get('fuel_level', 0),
+                'coolant_temp': latest_reading.get('coolant_temp', 0),
+                'engine_load': latest_reading.get('engine_load', 0),
+                'vehicle_speed': latest_reading.get('speed', 0),
+                'throttle_pos': latest_reading.get('throttle_pos', 0),
+                'intake_temp': latest_reading.get('intake_temp', 0),
+                'fuel_level': latest_reading.get('fuel_level', 0),
+                'fuel_trim_short': latest_reading.get('fuel_trim_short', 0),
+                'fuel_trim_long': latest_reading.get('fuel_trim_long', 0),
+                'fuel_pressure': latest_reading.get('fuel_pressure', 0),
+                'status': latest_reading.get('status', 'NORMAL'),
+                'health_status': latest_reading.get('health_status', 0),
+                'engine_stress_score': latest_reading.get('engine_stress_score', 0),
                 'data_quality_score': latest_reading.get('data_quality', 90)
             }
             

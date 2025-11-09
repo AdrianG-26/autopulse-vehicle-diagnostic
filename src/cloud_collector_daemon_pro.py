@@ -18,6 +18,15 @@ import hashlib
 # Add parent directory for imports
 sys.path.insert(0, os.path.dirname(__file__))
 
+# Import ML prediction
+try:
+    from ml_predictor import get_ml_predictor
+    from ml_storage import extend_supabase_storage_with_ml
+    ML_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️  ML prediction unavailable: {e}")
+    ML_AVAILABLE = False
+
 # Import cloud storage
 try:
     from supabase_direct_storage import supabase_storage
@@ -48,8 +57,13 @@ class ProfessionalCloudCollector:
         self.connection = None
         self.supported_commands = set()
         self.data_buffer = deque(maxlen=100)
-        self.batch_size = 10
+        self.batch_size = 3
         self.collection_interval = 1.0
+        self.ml_predictor = None
+        self.ml_storage = None
+        self.batch_counter = 0  # Track batches for ML prediction timing
+        self.ml_prediction_interval = 3  # Run ML every 3rd batch
+        
         self.running = Event()
         
         # Statistics
@@ -71,6 +85,20 @@ class ProfessionalCloudCollector:
             sys.exit(1)
         
         logger.info(f"🚀 Cloud Collector initialized - Session: {self.session_id}")
+        
+        # Initialize ML prediction
+        if ML_AVAILABLE:
+            try:
+                self.ml_predictor = get_ml_predictor()
+                self.ml_storage = extend_supabase_storage_with_ml(supabase_storage)
+                if self.ml_predictor.is_loaded:
+                    logger.info(f"🤖 ML Predictor loaded (Accuracy: {self.ml_predictor.metadata['accuracy']*100:.2f}%)")
+                else:
+                    logger.warning("⚠️  ML model not loaded, predictions disabled")
+            except Exception as e:
+                logger.warning(f"⚠️  ML initialization failed: {e}")
+                self.ml_predictor = None
+                self.ml_storage = None
         
         # Setup signal handlers
         signal.signal(signal.SIGINT, self._signal_handler)
@@ -545,6 +573,10 @@ class ProfessionalCloudCollector:
         try:
             batch_data = list(self.data_buffer)
             
+            # Increment batch counter for ML timing
+            self.batch_counter += 1
+            should_run_ml = (self.batch_counter % self.ml_prediction_interval == 0)
+            
             # DEBUG: Check first record
             if batch_data:
                 first = batch_data[0]
@@ -559,6 +591,30 @@ class ProfessionalCloudCollector:
             if success:
                 self.session_stats['stored_records'] += len(batch_data)
                 logger.info(f"💾 Batch stored: {len(batch_data)}/{len(batch_data)} records (Total: {self.session_stats['stored_records']})")
+
+                # Run ML prediction every Nth batch
+                if should_run_ml and self.ml_predictor and self.ml_predictor.is_loaded and self.ml_storage:
+                    try:
+                        # Use latest reading for prediction
+                        latest_reading = batch_data[-1]
+                        prediction = self.ml_predictor.predict(latest_reading)
+                        
+                        if prediction:
+                            # Store prediction to database
+                            sensor_data_id = None
+                            ml_success = self.ml_storage.store_prediction(
+                                self.current_vehicle_id, 
+                                sensor_data_id, 
+                                prediction
+                            )
+                            
+                            if ml_success:
+                                logger.info(f"🤖 ML Prediction: {prediction['predicted_status']} "
+                                          f"(confidence: {prediction['confidence_score']}%, "
+                                          f"risk: {prediction['failure_risk']})")
+                    except Exception as e:
+                        logger.error(f"❌ ML prediction error: {e}")
+
                 self.data_buffer.clear()
             else:
                 logger.warning("⚠️ Failed to upload batch to cloud")
