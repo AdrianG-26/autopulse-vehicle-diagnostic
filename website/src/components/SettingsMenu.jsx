@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { changeUserPassword, isSupabaseConfigured } from "../services/supabase";
+import { changeUserPassword } from "../services/supabase";
 
 export default function SettingsMenu({ userEmail, userId, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -136,38 +136,16 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
     setLoading(true);
 
     try {
-      if (isSupabaseConfigured()) {
-        // Use userId if available, otherwise use email
-        const identifier = userId || userEmail;
-        console.log('🔑 Change password - userId:', userId, 'userEmail:', userEmail, 'identifier:', identifier);
-        
-        if (!identifier) {
-          throw new Error('User information not available. Please log out and log back in.');
-        }
-        
-        await changeUserPassword(identifier, currentPassword, newPassword);
-        setSuccess("Password changed successfully!");
-      } else {
-        // Fallback to localStorage
-        const existingUsers = JSON.parse(localStorage.getItem('autopulse_users') || '[]');
-        const user = existingUsers.find(u => 
-          (userId && u.id === userId) || 
-          (userEmail && (u.email === userEmail || u.username === userEmail))
-        );
-        
-        if (!user) {
-          throw new Error('User not found');
-        }
-        
-        if (user.password !== currentPassword) {
-          throw new Error('Current password is incorrect');
-        }
-        
-        // Update password in localStorage
-        user.password = newPassword;
-        localStorage.setItem('autopulse_users', JSON.stringify(existingUsers));
-        setSuccess("Password changed successfully!");
+      // Use userId if available, otherwise use email
+      const identifier = userId || userEmail;
+      console.log('🔑 Change password - userId:', userId, 'userEmail:', userEmail, 'identifier:', identifier);
+      
+      if (!identifier) {
+        throw new Error('User information not available. Please log out and log back in.');
       }
+      
+      await changeUserPassword(identifier, currentPassword, newPassword);
+      setSuccess("Password changed successfully!");
       
       setCurrentPassword("");
       setNewPassword("");
