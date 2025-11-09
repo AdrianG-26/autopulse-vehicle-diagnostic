@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import StatusIndicator from "../components/StatusIndicator";
 import { vehicleMLService } from "../services/vehicleML";
 import sensorDataService from "../services/sensorData";
 
@@ -75,7 +74,6 @@ export default function Dashboard({ onNavigate }) {
                 Real-time monitoring • ML-powered diagnostics
             </p>
           </div>
-          <StatusIndicator status={pollingStatus} />
         </div>
 
           {/* ML Prediction - Hero Section */}

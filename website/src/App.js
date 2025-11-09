@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
 import Navbar from "./components/Navbar";
-import Contact from "./pages/Contact";
 import Dashboard from "./pages/Dashboard";
 import Emissions from "./pages/Emissions";
 import Engine from "./pages/Engine";
 import Fuel from "./pages/Fuel";
 import Login from "./pages/Login";
-import Logs from "./pages/Logs";
-import Settings from "./pages/Settings";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [tab, setTab] = useState("Dashboard");
@@ -77,9 +74,6 @@ function App() {
     if (tab === "Engine") return <Engine onNavigate={setTab} />;
     if (tab === "Fuel") return <Fuel onNavigate={setTab} />;
     if (tab === "Emissions") return <Emissions onNavigate={setTab} />;
-    if (tab === "Contact") return <Contact onNavigate={setTab} />;
-    if (tab === "Logs") return <Logs onNavigate={setTab} />;
-    if (tab === "Settings") return <Settings onNavigate={setTab} />;
     return <Dashboard onNavigate={setTab} />;
   };
 

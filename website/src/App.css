@@ -12,34 +12,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
+  background: #ffffff;
   padding: 20px;
 }
 
 .login-container {
   display: flex;
+  flex-direction: row;
   width: 100%;
   max-width: 1000px;
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
 }
 
 /* Login Branding (Left Panel) */
 .login-branding {
   flex: 1;
-  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  background: #3b82f6;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px;
+  padding: 60px 40px;
   text-align: center;
 }
 
 .branding-content {
-  max-width: 300px;
+  width: 100%;
 }
 
 .battery-icon {
@@ -81,9 +83,9 @@
 }
 
 .branding-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
-  margin: 0 0 16px 0;
+  margin: 0 0 8px 0;
   line-height: 1.2;
 }
 
@@ -100,6 +102,7 @@
   padding: 40px;
   display: flex;
   flex-direction: column;
+  background: #ffffff;
   justify-content: center;
 }
 
@@ -246,7 +249,7 @@
 /* Login Button */
 .login-button {
   width: 100%;
-  background: #1e40af;
+  background: #3b82f6;
   color: #ffffff;
   border: none;
   padding: 14px 20px;
@@ -258,12 +261,14 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
   margin-bottom: 24px;
 }
 
 .login-button:hover {
-  background: #1e3a8a;
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .arrow-icon {
@@ -795,14 +800,23 @@
   
   .login-container {
     flex-direction: column;
+    max-width: 100%;
   }
   
   .login-branding {
-    padding: 24px;
+    padding: 32px 24px;
+  }
+  
+  .branding-title {
+    font-size: 28px;
+  }
+  
+  .branding-tagline {
+    font-size: 16px;
   }
   
   .login-form {
-    padding: 24px;
+    padding: 32px 24px;
   }
 }
 
@@ -859,7 +873,8 @@
 .login-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  animation: buttonPulse 2s ease-in-out infinite;
+  transform: none;
+  box-shadow: none;
 }
 
 @keyframes buttonPulse {

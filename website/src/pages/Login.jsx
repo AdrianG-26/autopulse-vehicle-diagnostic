@@ -1,5 +1,4 @@
 import React from 'react';
-import LoginBranding from '../components/LoginBranding';
 import LoginFormSimple from '../components/LoginFormSimple';
 import { isSupabaseConfigured, signupUser, loginUser } from '../services/supabase';
 
@@ -69,7 +68,20 @@ export default function Login({ onLoginSuccess }) {
   return (
     <div className="login-page">
       <div className="login-container">
-        <LoginBranding />
+        {/* Top Header - Blue Background */}
+        <div className="login-branding">
+          <div className="branding-content">
+            <div style={{ fontSize: '48px', marginBottom: '0.5rem' }}>
+              🚗
+            </div>
+            <h1 className="branding-title">AutoPulse</h1>
+            <p className="branding-tagline">
+              Vehicle Diagnostic System
+            </p>
+          </div>
+        </div>
+        
+        {/* Login Form */}
         <LoginFormSimple 
           onLogin={handleLogin}
           onSignup={handleSignup}

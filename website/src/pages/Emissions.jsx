@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import sensorDataService from "../services/sensorData";
 import DonutProgress from "../components/DonutProgress";
-import StatusIndicator from "../components/StatusIndicator";
 
 export default function Emissions({ onNavigate }) {
   const [sensorData, setSensorData] = useState(null);
@@ -53,10 +52,9 @@ export default function Emissions({ onNavigate }) {
               🌿 Emissions Monitoring
             </h1>
             <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-              Real-time emissions system diagnostics and oxygen sensor monitoring
+              Real-time emissions system diagnostics and oxygen sensor monitoring • Status: {pollingStatus}
             </p>
           </div>
-          <StatusIndicator status={pollingStatus} />
         </div>
 
         {/* Key Metrics */}

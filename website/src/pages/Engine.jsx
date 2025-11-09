@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import sensorDataService from "../services/sensorData";
 import DonutProgress from "../components/DonutProgress";
-import StatusIndicator from "../components/StatusIndicator";
 
 export default function Engine({ onNavigate }) {
   const [sensorData, setSensorData] = useState(null);
@@ -47,10 +46,9 @@ export default function Engine({ onNavigate }) {
               🔧 Engine Diagnostics
             </h1>
             <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>
-              Real-time engine performance monitoring
+              Real-time engine performance monitoring • Status: {pollingStatus}
             </p>
           </div>
-          <StatusIndicator status={pollingStatus} />
         </div>
 
         {/* Key Metrics */}
