@@ -66,22 +66,6 @@ export default function EmissionsScreen() {
               value={`${fmt(data?.o2_sensor_1, 2)}V`}
             />
             <MetricTile
-              iconName="flash-outline"
-              iconBg="#EAF6EC"
-              iconColor="#2ecc71"
-              label="O₂ Sensor 2 Voltage"
-              value={`${fmt(data?.o2_sensor_2, 2)}V`}
-            />
-          </View>
-          <View style={styles.metricRow}>
-            <MetricTile
-              iconName="thermometer"
-              iconBg="#FFEFF2"
-              iconColor="#e74c3c"
-              label="Catalyst Temp"
-              value={`${fmt(data?.catalyst_temp, 1)}°C`}
-            />
-            <MetricTile
               iconName="trending-up"
               iconBg="#E9F5FF"
               iconColor={accent}
@@ -98,21 +82,14 @@ export default function EmissionsScreen() {
               value={`${fmt(data?.fuel_trim_long, 2)}%`}
             />
             <MetricTile
-              iconName="bug-outline"
-              iconBg="#FFEFF2"
-              iconColor="#e74c3c"
-              label="EGR Error"
-              value={`${fmt(data?.egr_error, 2)}%`}
-            />
-          </View>
-          <View style={styles.metricRow}>
-            <MetricTile
               iconName="cloud-outline"
               iconBg="#E9F5FF"
               iconColor={accent}
               label="Barometric Pressure"
               value={`${fmt(data?.barometric_pressure, 1)} kPa`}
             />
+          </View>
+          <View style={styles.metricRow}>
             <MetricTile
               iconName="analytics-outline"
               iconBg="#EAF6EC"
@@ -120,8 +97,6 @@ export default function EmissionsScreen() {
               label="MAF (Air Flow)"
               value={`${fmt(data?.maf, 2)} g/s`}
             />
-          </View>
-          <View style={styles.metricRow}>
             <MetricTile
               iconName="thermometer-outline"
               iconBg="#FFF4DD"

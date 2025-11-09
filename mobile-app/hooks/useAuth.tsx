@@ -152,7 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user?.id) return;
     try {
       const { data, error } = await supabase
-        .from('vehicles')
+        .from('vehicle_profiles')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });

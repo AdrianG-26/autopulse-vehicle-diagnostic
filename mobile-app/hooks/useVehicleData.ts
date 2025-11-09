@@ -1,8 +1,8 @@
 import { rpiApi, VehicleData } from "@/lib/rpiApi";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 /**
- * Custom hook for accessing vehicle data from Raspberry Pi via REST API
+ * Custom hook for accessing vehicle data from Supabase with auto-refresh every 5 seconds
  */
 export function useVehicleData() {
   const [data, setData] = useState<VehicleData | null>(null);
@@ -10,34 +10,58 @@ export function useVehicleData() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  useEffect(() => {
-    // Initial data fetch
-    fetchData();
+  /**
+   * Fetch data from Supabase (wrapped in useCallback for stable reference)
+   */
+  const fetchData = useCallback(async (showLoading: boolean = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
+    
+    try {
+      const response = await rpiApi.fetchLatest();
+      
+      // Always update state to trigger re-render
+      setData(response.data);
+      setLastUpdate(new Date());
+
+      if (!response.success) {
+        setError(response.error || "Failed to fetch data");
+      } else {
+        setError(null);
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  /**
-   * Fetch data from REST API
-   */
-  const fetchData = async () => {
-    setLoading(true);
-    const response = await rpiApi.fetchLatest();
-    setData(response.data);
-    setLoading(false);
-    setLastUpdate(new Date());
+  useEffect(() => {
+    console.log('🚀 Auto-refresh initialized - fetching every 5 seconds');
+    
+    // Initial data fetch
+    fetchData();
 
-    if (!response.success) {
-      setError(response.error || "Failed to fetch data");
-    } else {
-      setError(null);
-    }
-  };
+    // Set up auto-refresh every 5 seconds
+    const intervalId = setInterval(() => {
+      console.log('⏰ Auto-refresh triggered');
+      fetchData(false); // Don't show loading on auto-refresh to avoid UI flicker
+    }, 5000);
+
+    // Cleanup interval on unmount
+    return () => {
+      console.log('🛑 Auto-refresh stopped');
+      clearInterval(intervalId);
+    };
+  }, [fetchData]);
 
   /**
    * Manually refresh data (for pull-to-refresh)
    */
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     await fetchData();
-  };
+  }, [fetchData]);
 
   return {
     data,

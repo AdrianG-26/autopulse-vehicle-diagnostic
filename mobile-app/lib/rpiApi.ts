@@ -30,7 +30,7 @@ interface VehicleData {
   egr_error: number;
   barometric_pressure: number;
   fuel_pressure: number;
-  engine_runtime: number;
+  run_time: number;
   control_module_voltage: number;
   dtc_count: number;
   fuel_system_status: string;
@@ -42,9 +42,11 @@ interface VehicleData {
   status: string;
   fault_type: string;
   data_quality_score: number;
-  ml_health_score: number;
-  ml_status: string;
-  ml_alerts: string[];
+  health_status?: number; // Health status from Supabase (0=Normal, 1=Advisory, 2=Warning, 3=Critical)
+  // ML-related fields (optional - may not exist in all tables)
+  ml_health_score?: number;
+  ml_status?: string;
+  ml_alerts?: string[];
 }
 
 interface ApiResponse {
@@ -116,6 +118,8 @@ class VehicleDataAPI {
       // Import supabase - dynamic import to avoid circular dependencies
       const { supabase } = await import('./supabase');
       
+      console.log('🔄 Fetching latest data from Supabase...', new Date().toLocaleTimeString());
+      
       const { data, error } = await supabase
         .from('sensor_data')
         .select('*')
@@ -124,11 +128,12 @@ class VehicleDataAPI {
         .single();
 
       if (error) {
-        console.error('Supabase query error:', error);
+        console.error('❌ Supabase query error:', error);
         throw error;
       }
 
       if (!data) {
+        console.log('⚠️ No data returned from Supabase');
         return {
           success: false,
           data: null,
@@ -136,6 +141,20 @@ class VehicleDataAPI {
           message: 'No data available yet'
         };
       }
+
+      const healthStatusText = 
+        data.health_status === 0 ? 'Normal' :
+        data.health_status === 1 ? 'Advisory' :
+        data.health_status === 2 ? 'Warning' :
+        data.health_status === 3 ? 'Critical' : 'Unknown';
+      
+      console.log('✅ Data fetched successfully:', {
+        timestamp: data.timestamp,
+        rpm: data.rpm,
+        status: data.status,
+        run_time: data.run_time,
+        health_status: `${data.health_status} (${healthStatusText})`
+      });
 
       // Store latest data for immediate access
       this.latestData = data as VehicleData;
@@ -146,7 +165,7 @@ class VehicleDataAPI {
         timestamp: data.timestamp || new Date().toISOString()
       };
     } catch (error: any) {
-      console.error("Error fetching from Supabase:", error);
+      console.error("❌ Error fetching from Supabase:", error);
       return {
         success: false,
         data: null,

@@ -59,38 +59,6 @@ export default function FuelScreen() {
         <View style={styles.card}>
           <View style={styles.metricRow}>
             <MetricTile
-              iconName="information-circle-outline"
-              iconBg="#EAF6EC"
-              iconColor="#2ecc71"
-              label="Fuel System Status"
-              value={data?.fuel_system_status || "N/A"}
-            />
-            <MetricTile
-              iconName="water-outline"
-              iconBg="#E9F5FF"
-              iconColor={accent}
-              label="Fuel Pressure"
-              value={`${fmt(data?.fuel_pressure, 1)} kPa`}
-            />
-          </View>
-          <View style={styles.metricRow}>
-            <MetricTile
-              iconName="beaker-outline"
-              iconBg="#FFF4DD"
-              iconColor="#f1c40f"
-              label="Fuel Level"
-              value={`${fmt(data?.fuel_level, 1)}%`}
-            />
-            <MetricTile
-              iconName="speedometer-outline"
-              iconBg="#E9F5FF"
-              iconColor={accent}
-              label="Fuel Efficiency"
-              value={`${fmt(data?.fuel_efficiency, 2)}`}
-            />
-          </View>
-          <View style={styles.metricRow}>
-            <MetricTile
               iconName="trending-up"
               iconBg="#EAF6EC"
               iconColor="#2ecc71"

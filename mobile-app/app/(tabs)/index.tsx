@@ -21,7 +21,7 @@ import {
 export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const accent = Colors.light.tint;
-  const { data, loading, refresh } = useVehicleData();
+  const { data, loading, refresh, lastUpdate } = useVehicleData();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -33,6 +33,15 @@ export default function HomeScreen() {
   // Helper to format values with fallback
   const fmt = (val: number | null | undefined, decimals: number = 1) =>
     formatValue(val, decimals, "N/A");
+
+  // Helper to get health status text and color from numeric value
+  const getHealthStatus = (value: number | null | undefined): { text: string; color: string } => {
+    if (value === 0) return { text: "Normal", color: "#2ecc71" };      // Green
+    if (value === 1) return { text: "Advisory", color: "#3498db" };    // Blue
+    if (value === 2) return { text: "Warning", color: "#f1c40f" };     // Yellow
+    if (value === 3) return { text: "Critical", color: "#e74c3c" };    // Red
+    return { text: "N/A", color: "#95a5a6" };                          // Gray
+  };
 
   return (
     <ScrollView
@@ -68,44 +77,36 @@ export default function HomeScreen() {
         <ThemedText style={styles.headerSubtitle}>
           Monitor your vehicle&apos;s performance
         </ThemedText>
+        {lastUpdate && (
+          <View style={styles.lastUpdateContainer}>
+            <Ionicons name="time-outline" size={14} color="#7F8C8D" />
+            <ThemedText style={styles.lastUpdateText}>
+              Updated: {lastUpdate.toLocaleTimeString()}
+            </ThemedText>
+          </View>
+        )}
       </View>
 
       <View style={styles.panelContainer}>
         <ThemedText type="subtitle" style={styles.panelTitle}>
-          Random Forest ML Prediction
+          Vehicle Health Status
         </ThemedText>
 
         <View style={styles.panelCard}>
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
-              <Ionicons name="analytics" size={24} color="#0a7ea4" />
+              <Ionicons name="heart" size={24} color="#0a7ea4" />
               <ThemedText style={styles.panelRowLabel}>
-                ML Health Score
+                Health Status
               </ThemedText>
             </View>
-            <ThemedText style={styles.healthScore}>
-              {data?.ml_health_score
-                ? `${fmt(data.ml_health_score, 0)}%`
-                : "N/A"}
-            </ThemedText>
-          </View>
-
-          <View style={styles.panelDivider} />
-
-          <View style={styles.panelRow}>
-            <View style={styles.panelRowLeft}>
-              <Ionicons name="shield-checkmark" size={24} color="#0a7ea4" />
-              <ThemedText style={styles.panelRowLabel}>
-                System Status
-              </ThemedText>
-            </View>
-            {data?.ml_status ? (
+            {data?.health_status != null ? (
               <View
                 style={[
                   styles.badge,
                   {
-                    backgroundColor: `${getStatusColor(data.ml_status)}22`,
-                    borderColor: getStatusColor(data.ml_status),
+                    backgroundColor: `${getHealthStatus(data.health_status).color}22`,
+                    borderColor: getHealthStatus(data.health_status).color,
                   },
                 ]}
               >
@@ -113,11 +114,11 @@ export default function HomeScreen() {
                   style={[
                     styles.badgeText,
                     {
-                      color: getStatusColor(data.ml_status),
+                      color: getHealthStatus(data.health_status).color,
                     },
                   ]}
                 >
-                  {data.ml_status}
+                  {getHealthStatus(data.health_status).text}
                 </ThemedText>
               </View>
             ) : (
@@ -127,32 +128,18 @@ export default function HomeScreen() {
 
           <View style={styles.panelDivider} />
 
-          <View style={styles.troubleCodesSection}>
-            <View style={styles.troubleCodesHeader}>
-              <IconSymbol
-                name="exclamationmark.triangle"
-                size={22}
-                color="#d35400"
-              />
-              <ThemedText style={styles.troubleCodesTitle}>
-                ML Alerts
+          <View style={styles.panelRow}>
+            <View style={styles.panelRowLeft}>
+              <Ionicons name="analytics" size={24} color="#0a7ea4" />
+              <ThemedText style={styles.panelRowLabel}>
+                Data Quality
               </ThemedText>
             </View>
-            {!data?.ml_alerts || data.ml_alerts.length === 0 ? (
-              <ThemedText style={styles.troubleCodesEmpty}>
-                {data
-                  ? "✅ All systems operating normally"
-                  : "Waiting for data from Raspberry Pi"}
-              </ThemedText>
-            ) : (
-              <View style={styles.troubleCodesList}>
-                {data.ml_alerts.map((alert: string, idx: number) => (
-                  <ThemedText key={idx} style={styles.alertText}>
-                    • {alert}
-                  </ThemedText>
-                ))}
-              </View>
-            )}
+            <ThemedText style={styles.healthScore}>
+              {data?.data_quality_score
+                ? `${fmt(data.data_quality_score, 0)}%`
+                : "N/A"}
+            </ThemedText>
           </View>
         </View>
       </View>
@@ -321,20 +308,6 @@ export default function HomeScreen() {
 
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
-              <Ionicons name="flame-outline" size={24} color="#0a7ea4" />
-              <ThemedText style={styles.panelRowLabel}>
-                Catalyst Temp
-              </ThemedText>
-            </View>
-            <ThemedText style={styles.healthScore}>
-              {fmt(data?.catalyst_temp, 1)}°C
-            </ThemedText>
-          </View>
-
-          <View style={styles.panelDivider} />
-
-          <View style={styles.panelRow}>
-            <View style={styles.panelRowLeft}>
               <Ionicons name="cloud-outline" size={24} color="#0a7ea4" />
               <ThemedText style={styles.panelRowLabel}>
                 Baro Pressure
@@ -385,17 +358,6 @@ export default function HomeScreen() {
             </ThemedText>
           </View>
 
-          <View style={styles.panelDivider} />
-
-          <View style={styles.panelRow}>
-            <View style={styles.panelRowLeft}>
-              <Ionicons name="water" size={24} color="#0a7ea4" />
-              <ThemedText style={styles.panelRowLabel}>Fuel Level</ThemedText>
-            </View>
-            <ThemedText style={styles.healthScore}>
-              {fmt(data?.fuel_level, 1)}%
-            </ThemedText>
-          </View>
         </View>
       </View>
 
@@ -404,51 +366,6 @@ export default function HomeScreen() {
           Fuel System
         </ThemedText>
         <View style={styles.panelCard}>
-          <View style={styles.panelRow}>
-            <View style={styles.panelRowLeft}>
-              <Ionicons
-                name="information-circle-outline"
-                size={24}
-                color="#0a7ea4"
-              />
-              <ThemedText style={styles.panelRowLabel}>
-                Fuel System Status
-              </ThemedText>
-            </View>
-            <ThemedText style={styles.healthScore}>
-              {data?.fuel_system_status || "N/A"}
-            </ThemedText>
-          </View>
-
-          <View style={styles.panelDivider} />
-
-          <View style={styles.panelRow}>
-            <View style={styles.panelRowLeft}>
-              <Ionicons name="water" size={24} color="#0a7ea4" />
-              <ThemedText style={styles.panelRowLabel}>
-                Fuel Pressure
-              </ThemedText>
-            </View>
-            <ThemedText style={styles.healthScore}>
-              {fmt(data?.fuel_pressure, 1)} kPa
-            </ThemedText>
-          </View>
-
-          <View style={styles.panelDivider} />
-
-          <View style={styles.panelRow}>
-            <View style={styles.panelRowLeft}>
-              <Ionicons name="speedometer-outline" size={24} color="#0a7ea4" />
-              <ThemedText style={styles.panelRowLabel}>
-                Fuel Efficiency
-              </ThemedText>
-            </View>
-            <ThemedText style={styles.healthScore}>
-              {fmt(data?.fuel_efficiency, 2)}
-            </ThemedText>
-          </View>
-
-          <View style={styles.panelDivider} />
 
           <View style={styles.panelRow}>
             <View style={styles.panelRowLeft}>
@@ -513,19 +430,7 @@ export default function HomeScreen() {
               </ThemedText>
             </View>
             <ThemedText style={styles.healthScore}>
-              {fmt(data?.engine_runtime, 0)} min
-            </ThemedText>
-          </View>
-
-          <View style={styles.panelDivider} />
-
-          <View style={styles.panelRow}>
-            <View style={styles.panelRowLeft}>
-              <Ionicons name="bug-outline" size={24} color="#0a7ea4" />
-              <ThemedText style={styles.panelRowLabel}>EGR Error</ThemedText>
-            </View>
-            <ThemedText style={styles.healthScore}>
-              {fmt(data?.egr_error, 2)}%
+              {fmt(data?.run_time, 0)} sec
             </ThemedText>
           </View>
 
@@ -688,5 +593,16 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontWeight: "400",
     letterSpacing: 0.25,
+  },
+  lastUpdateContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 8,
+    gap: 4,
+  },
+  lastUpdateText: {
+    fontSize: 12,
+    color: "#7F8C8D",
+    fontStyle: "italic",
   },
 });

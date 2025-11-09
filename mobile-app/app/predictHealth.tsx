@@ -108,10 +108,8 @@ export default function PredictHealthScreen() {
     engineScore = Math.max(0, engineScore);
 
     // Fuel system health calculation
-    const avgFuelPressure = data.reduce((sum, d) => sum + (d.fuel_pressure_kpa || 0), 0) / data.length;
     const avgStft = data.reduce((sum, d) => sum + Math.abs(d.stft_b1_pct || 0), 0) / data.length;
     let fuelScore = 100;
-    if (avgFuelPressure < 200 || avgFuelPressure > 400) fuelScore -= 20;
     if (Math.abs(avgStft) > 10) fuelScore -= 15;
     fuelScore = Math.max(0, fuelScore);
 

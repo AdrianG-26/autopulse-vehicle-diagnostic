@@ -98,21 +98,14 @@ export default function EngineScreen() {
               value={`${fmt(data?.intake_temp, 1)}°C`}
             />
             <MetricTile
-              iconName="flame"
-              iconBg="#FFEFF2"
-              iconColor="#e74c3c"
-              label="Catalyst Temp"
-              value={`${fmt(data?.catalyst_temp, 1)}°C`}
-            />
-          </View>
-          <View style={styles.metricRow}>
-            <MetricTile
               iconName="flash"
               iconBg="#FFF4DD"
               iconColor="#f1c40f"
               label="Timing Advance"
               value={`${fmt(data?.timing_advance, 1)}°`}
             />
+          </View>
+          <View style={styles.metricRow}>
             <MetricTile
               iconName="analytics"
               iconBg="#E9F5FF"
@@ -120,8 +113,6 @@ export default function EngineScreen() {
               label="MAF (Air Flow)"
               value={`${fmt(data?.maf, 2)} g/s`}
             />
-          </View>
-          <View style={styles.metricRow}>
             <MetricTile
               iconName="stats-chart"
               iconBg="#E9F5FF"
@@ -129,6 +120,8 @@ export default function EngineScreen() {
               label="MAP (Pressure)"
               value={`${fmt(data?.map, 1)} kPa`}
             />
+          </View>
+          <View style={styles.metricRow}>
             <MetricTile
               iconName="speedometer-outline"
               iconBg="#E8F1F7"
