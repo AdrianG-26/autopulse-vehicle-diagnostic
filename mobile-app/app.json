@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
+      }
     },
     "android": {
       "package": "com.adriang26.autopulse",
@@ -17,7 +22,18 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE",
+        "WAKE_LOCK"
+      ]
+    },
+    "notification": {
+      "icon": "./assets/images/notification-icon.png",
+      "color": "#0a7ea4",
+      "androidMode": "default",
+      "androidCollapsedTitle": "AutoPulse Vehicle Alert"
     },
     "web": {
       "bundler": "metro",
@@ -33,6 +49,15 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#0a7ea4",
+          "sounds": ["./assets/sounds/notification.wav"],
+          "mode": "production"
         }
       ]
     ],
