@@ -41,8 +41,8 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
       case "newPassword":
         if (!value) {
           newErrors.newPassword = "New password is required";
-        } else if (value.length < 6) {
-          newErrors.newPassword = "Password must be at least 6 characters";
+        } else if (value.length < 8) {
+          newErrors.newPassword = "Password must be at least 8 characters";
         } else if (value === currentPassword) {
           newErrors.newPassword = "New password must be different from current password";
         } else {
