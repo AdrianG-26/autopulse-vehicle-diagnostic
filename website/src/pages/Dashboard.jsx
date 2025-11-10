@@ -32,7 +32,6 @@ export default function Dashboard({ onNavigate }) {
   // sensorData is fetched from Supabase via sensorDataService.subscribeToSensorData()
   const mlHealthScore = sensorData?.mlHealthScore ?? null;
   const mlStatus = sensorData?.mlStatus || sensorData?.status || "UNKNOWN";
-  const hasMLData = mlHealthScore !== null && mlHealthScore !== undefined;
   // Decide which status to display: prefer mlStatus/status if present; otherwise show Disconnected
   const hasAnyStatus = Boolean(sensorData?.mlStatus || sensorData?.status);
   // vehicleMLService.getStatusDisplay() only formats the display (text/color/icon), doesn't fetch data
