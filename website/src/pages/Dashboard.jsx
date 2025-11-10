@@ -5,7 +5,6 @@ import sensorDataService from "../services/sensorData";
 export default function Dashboard({ onNavigate }) {
   const [sensorData, setSensorData] = useState(null);
   const [pollingStatus, setPollingStatus] = useState("WAITING");
-  const [lastUpdate, setLastUpdate] = useState(null);
 
   useEffect(() => {
     console.log('📊 Dashboard - Setting up sensor data subscription');
@@ -14,7 +13,6 @@ export default function Dashboard({ onNavigate }) {
       (data) => {
         if (data) {
           setSensorData(data);
-          setLastUpdate(new Date());
           setPollingStatus("CONNECTED");
         } else {
           setPollingStatus("WAITING");
@@ -39,7 +37,6 @@ export default function Dashboard({ onNavigate }) {
   const statusDisplay = !hasMLData 
     ? { text: "Disconnected", color: "#9ca3af", icon: "⏸️" }
     : vehicleMLService.getStatusDisplay(mlStatus);
-  const healthColor = !hasMLData ? "#9ca3af" : vehicleMLService.getHealthScoreColor(mlHealthScore);
 
   return (
     <>

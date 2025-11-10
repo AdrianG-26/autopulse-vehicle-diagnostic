@@ -342,7 +342,6 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
                     type="password"
                     value={currentPassword}
                     onChange={(e) => handleChange("currentPassword", e.target.value)}
-                    onBlur={() => handleBlur("currentPassword")}
                     style={{
                       width: "100%",
                       boxSizing: "border-box",
@@ -388,7 +387,6 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
                     type="password"
                     value={newPassword}
                     onChange={(e) => handleChange("newPassword", e.target.value)}
-                    onBlur={() => handleBlur("newPassword")}
                     style={{
                       width: "100%",
                       boxSizing: "border-box",
@@ -434,7 +432,6 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => handleChange("confirmPassword", e.target.value)}
-                    onBlur={() => handleBlur("confirmPassword")}
                     style={{
                       width: "100%",
                       boxSizing: "border-box",
@@ -512,4 +509,3 @@ export default function SettingsMenu({ userEmail, userId, onLogout }) {
     </div>
   );
 }
-
