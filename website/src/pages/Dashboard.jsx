@@ -38,6 +38,23 @@ export default function Dashboard({ onNavigate }) {
     ? { text: "Disconnected", color: "#9ca3af", icon: "⏸️" }
     : vehicleMLService.getStatusDisplay(mlStatus);
 
+  const healthStatusLevel =
+    sensorData && sensorData.healthStatus !== null && sensorData.healthStatus !== undefined
+      ? Number(sensorData.healthStatus)
+      : null;
+
+  const healthStatusMap = {
+    0: { label: "Normal", color: "#10b981", badge: "🟢" },
+    1: { label: "Advisory", color: "#f59e0b", badge: "⚠️" },
+    2: { label: "Warning", color: "#ef4444", badge: "⚠️" },
+    3: { label: "Critical", color: "#dc2626", badge: "🚨" },
+  };
+
+  const healthStatusDisplay =
+    healthStatusLevel !== null && healthStatusLevel >= 0
+      ? healthStatusMap[healthStatusLevel] || { label: "Unknown", color: "#6b7280", badge: "❓" }
+      : null;
+
   return (
     <>
       <style>{`
@@ -172,6 +189,31 @@ export default function Dashboard({ onNavigate }) {
                 <div style={{ fontSize: "2rem", fontWeight: "800", color: "#ffffff", lineHeight: "1" }}>
                   {statusDisplay.text}
                 </div>
+                {healthStatusDisplay && (
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "6px 12px",
+                      borderRadius: "9999px",
+                      backgroundColor: "rgba(255, 255, 255, 0.18)",
+                      border: "1px solid rgba(255, 255, 255, 0.25)",
+                      color: healthStatusDisplay.color,
+                      fontSize: "0.85rem",
+                      fontWeight: "600",
+                    }}
+                  >
+                    <span style={{ fontSize: "1.1rem" }}>{healthStatusDisplay.badge}</span>
+                    <span>
+                      Health Status {healthStatusLevel}
+                      <span style={{ marginLeft: "6px", color: "rgba(255, 255, 255, 0.9)" }}>
+                        ({healthStatusDisplay.label})
+                      </span>
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div style={{
