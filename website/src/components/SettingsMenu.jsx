@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { changeUserPassword } from "../services/supabase";
 
 export default function SettingsMenu({ userEmail, userId, onLogout }) {
