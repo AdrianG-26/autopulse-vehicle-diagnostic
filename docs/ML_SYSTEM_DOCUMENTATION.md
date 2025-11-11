@@ -999,5 +999,3 @@ sudo nmcli device disconnect wlan0
 # Reconnect to a saved network
 sudo nmcli connection up "NETWORK_NAME"
 ```
-
-

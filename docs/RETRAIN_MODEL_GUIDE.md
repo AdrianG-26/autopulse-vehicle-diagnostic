@@ -229,13 +229,13 @@ WARNING  → NORMAL errors = 0  (should be zero)
 
 **Before & After Comparison:**
 
-| Metric | Before (3-class) | After (4-class) |
-|--------|------------------|-----------------|
-| Classes | NORMAL/ADVISORY/CRITICAL | All 4 classes |
-| Samples | 8,125 | 8,300+ (estimate) |
-| Accuracy | 95.63% | 96-98% (expected) |
-| WARNING Detection | ❌ Excluded (n=1) | ✅ Enabled |
-| Status | Partial spectrum | Full spectrum |
+| Metric            | Before (3-class)         | After (4-class)   |
+| ----------------- | ------------------------ | ----------------- |
+| Classes           | NORMAL/ADVISORY/CRITICAL | All 4 classes     |
+| Samples           | 8,125                    | 8,300+ (estimate) |
+| Accuracy          | 95.63%                   | 96-98% (expected) |
+| WARNING Detection | ❌ Excluded (n=1)        | ✅ Enabled        |
+| Status            | Partial spectrum         | Full spectrum     |
 
 This demonstrates:
 
