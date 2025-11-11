@@ -940,15 +940,23 @@ if self.batch_counter % 3 == 0:
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: November 10, 2025  
-**System Status**: ✅ Production Ready  
-**Model Accuracy**: 94-96%  
+**Document Version**: 1.0
+
+**Last Updated**: November 10, 2025
+
+**System Status**: ✅ Production Ready
+
+**Model Accuracy**: 94-96%
+
 **Prediction Latency**: <15ms
 
 ---
 
-# Check if you're connected to internet
+## Network Connectivity Commands
+
+Check if you're connected to internet:
+
+```bash
 ping -c 4 google.com
 
 # Check network interfaces status
@@ -965,10 +973,21 @@ nmcli device status
 
 # Show active connections
 nmcli connection show --active
-# Scan for available Wi-Fi networks
-sudo nmcli device wifi list
+```
 
-# Connect to a Wi-Fi network
+## Wi-Fi Connection Management
+
+Scan for available Wi-Fi networks:
+
+```bash
+sudo nmcli device wifi list
+```
+
+## Connect to Wi-Fi
+
+Connect to a Wi-Fi network:
+
+```bash
 sudo nmcli device wifi connect "NETWORK_NAME" password "YOUR_PASSWORD"
 
 # Example:
@@ -979,4 +998,6 @@ sudo nmcli device disconnect wlan0
 
 # Reconnect to a saved network
 sudo nmcli connection up "NETWORK_NAME"
+```
+
 

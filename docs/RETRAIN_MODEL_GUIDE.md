@@ -3,7 +3,8 @@
 ## 📍 Model Location
 
 Your trained model files are stored in:
-```
+
+```text
 ~/vehicle_diagnostic_system/models/
 ├── vehicle_health_rf_model_4class.pkl    (3.5 MB) - Main model
 ├── scaler_4class.pkl                      (2.0 KB) - Feature scaler
@@ -14,7 +15,7 @@ Your trained model files are stored in:
 
 ## 🔄 How to Retrain with New Data
 
-### Tomorrow's Simple 3-Step Process:
+### Tomorrow's Simple 3-Step Process
 
 After collecting WARNING/CRITICAL data, just run:
 
@@ -37,19 +38,22 @@ python3 src/ml/predict_health.py
 
 ## 🎯 Data Collection Tips for Tomorrow
 
-### WARNING Samples (need ≥2, aim for 50-100):
+### WARNING Samples (need ≥2, aim for 50-100)
+
 - Low fuel level (<10%)
 - Slightly high coolant temp (95-100°C)
 - Battery voltage 11.5-12V
 - Moderate engine stress conditions
 
-### CRITICAL Samples (already have 705, but more helps):
+### CRITICAL Samples (already have 705, but more helps)
+
 - Very high coolant temp (>100°C) - **BE CAREFUL!**
 - Very low battery (<11V)
 - Heavy load + high RPM for extended periods
 - Active DTCs/check engine light
 
 **Safety Tips:**
+
 - ⚠️ Don't damage your engine - monitor temperature closely
 - Have coolant/water ready if testing high temps
 - Don't let battery die completely
@@ -59,8 +63,9 @@ python3 src/ml/predict_health.py
 
 ## 📊 Expected Results
 
-### Current Model (3-class):
-```
+### Current Model (3-class)
+
+```text
 NORMAL:    6,474 samples (79.7%)
 ADVISORY:    946 samples (11.6%)
 WARNING:       1 sample  ( 0.0%) ← EXCLUDED
@@ -69,8 +74,9 @@ CRITICAL:    705 samples ( 8.7%)
 Accuracy: 95.63%
 ```
 
-### After Tomorrow (4-class):
-```
+### After Tomorrow (4-class)
+
+```text
 NORMAL:    6,500+ samples (70-75%)
 ADVISORY:  1,000+ samples (10-12%)
 WARNING:     100+ samples ( 1-3%)  ← NEW!
@@ -184,6 +190,7 @@ echo "✅ Created retrain_model.sh"
 ```
 
 Then just run:
+
 ```bash
 ./retrain_model.sh
 ```
@@ -195,19 +202,23 @@ Then just run:
 After retraining, verify:
 
 ### 1. Overall Accuracy
+
 - ✅ Should be **≥95%** (ideally 96-98%)
 
 ### 2. Critical Safety Check
-```
+
+```text
 CRITICAL → NORMAL errors = 0  (must be zero!)
 WARNING  → NORMAL errors = 0  (should be zero)
 ```
 
 ### 3. Class Distribution
+
 - ✅ All 4 classes present (NORMAL, ADVISORY, WARNING, CRITICAL)
 - ✅ WARNING has ≥2 samples (ideally 50+)
 
 ### 4. Per-Class Performance
+
 - ✅ Precision >75% for all classes
 - ✅ Recall >90% for all classes
 - ✅ F1-Score >85% for all classes
@@ -227,6 +238,7 @@ WARNING  → NORMAL errors = 0  (should be zero)
 | Status | Partial spectrum | Full spectrum |
 
 This demonstrates:
+
 - **Iterative improvement** with more data
 - **Scalability** of the approach
 - **Adaptive classification** in action
@@ -256,6 +268,7 @@ A: If it loads from the same file path (`models/vehicle_health_rf_model_4class.p
 **Ready to retrain tomorrow!** 🚀
 
 Just remember:
+
 1. Collect WARNING/CRITICAL data (safely!)
 2. Wait for Supabase sync (~5 min)
 3. Run 3 commands (or use retrain_model.sh)

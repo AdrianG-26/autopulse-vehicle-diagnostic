@@ -4,7 +4,7 @@
 
 This enhanced version stores vehicle data directly to **Supabase cloud database** instead of local SQLite, enabling real-time cloud analytics and scalable fleet management.
 
-```
+```text
 🔄 CLOUD-FIRST FLOW:
 OBD-II → Cloud Collector → Supabase → Cloud Web Server → React Frontend
 ```
@@ -12,24 +12,28 @@ OBD-II → Cloud Collector → Supabase → Cloud Web Server → React Frontend
 ## 🆕 New Components
 
 ### 1. **Supabase Direct Storage** (`supabase_direct_storage.py`)
+
 - Direct cloud data storage service
 - Vehicle profile management
 - Batch sensor data uploads
 - Real-time data updates
 
-### 2. **Cloud Collector Daemon** (`cloud_collector_daemon.py`) 
+### 2. **Cloud Collector Daemon** (`cloud_collector_daemon.py`)
+
 - Enhanced version of the original collector
 - Stores data directly to Supabase (no local SQLite)
 - Optimized for cloud sync with smaller batches
 - Automatic vehicle profile creation
 
 ### 3. **Cloud Web Server** (`cloud_web_server.py`)
+
 - Fetches data from Supabase for ML predictions
 - Real-time WebSocket updates from cloud
 - Cloud-based vehicle health scoring
 - Scalable multi-vehicle support
 
 ### 4. **Migration Helper** (`cloud_migration_helper.py`)
+
 - Environment validation
 - Dependency installation
 - Connection testing
@@ -37,21 +41,23 @@ OBD-II → Cloud Collector → Supabase → Cloud Web Server → React Frontend
 
 ## 🎯 Key Benefits
 
-✅ **Real-time sync** across all devices  
-✅ **Scalable** cloud infrastructure  
-✅ **Multi-vehicle** fleet management  
-✅ **Automatic backups** and reliability  
-✅ **Reduced local** storage requirements  
-✅ **Enhanced ML** with cloud processing power  
+✅ **Real-time sync** across all devices
+✅ **Scalable** cloud infrastructure
+✅ **Multi-vehicle** fleet management
+✅ **Automatic backups** and reliability
+✅ **Reduced local** storage requirements
+✅ **Enhanced ML** with cloud processing power
 
 ## 🛠️ Quick Setup
 
 ### 1. **Install Dependencies**
+
 ```bash
 python src/cloud_migration_helper.py --install-deps
 ```
 
 ### 2. **Configure Supabase**
+
 ```bash
 # Create environment template
 python src/cloud_migration_helper.py --create-env
@@ -62,6 +68,7 @@ cp .env.template .env
 ```
 
 ### 3. **Verify Setup**
+
 ```bash
 # Check migration readiness
 python src/cloud_migration_helper.py --check
@@ -73,6 +80,7 @@ python src/cloud_migration_helper.py --test-connection
 ### 4. **Start Cloud Services**
 
 **Option A: Direct Start**
+
 ```bash
 # Start cloud web server
 python src/cloud_web_server.py
