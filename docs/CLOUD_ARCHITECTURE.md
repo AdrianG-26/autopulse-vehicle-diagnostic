@@ -79,7 +79,7 @@ python src/cloud_migration_helper.py --test-connection
 
 ### 4. **Start Cloud Services**
 
-**Option A: Direct Start**
+#### Option A: Direct Start
 
 ```bash
 # Start cloud web server
@@ -91,18 +91,19 @@ python src/cloud_collector_daemon.py
 
 ## 📊 Architecture Comparison
 
-| Component | **Old (SQLite)** | **New (Cloud)** |
-|-----------|------------------|-----------------|
-| Data Storage | Local SQLite | Supabase Cloud |
-| Collector | `automated_car_collector_daemon.py` | `cloud_collector_daemon.py` |
-| Web Server | `web_server.py` | `cloud_web_server.py` |
-| Database | `enhanced_database.py` | `supabase_direct_storage.py` |
-| Data Flow | Local only | Real-time cloud sync |
-| Scalability | Single device | Multi-device fleet |
+| Component    | **Old (SQLite)**                    | **New (Cloud)**              |
+| ------------ | ----------------------------------- | ---------------------------- |
+| Data Storage | Local SQLite                        | Supabase Cloud               |
+| Collector    | `automated_car_collector_daemon.py` | `cloud_collector_daemon.py`  |
+| Web Server   | `web_server.py`                     | `cloud_web_server.py`        |
+| Database     | `enhanced_database.py`              | `supabase_direct_storage.py` |
+| Data Flow    | Local only                          | Real-time cloud sync         |
+| Scalability  | Single device                       | Multi-device fleet           |
 
 ## 🔧 Configuration
 
 ### Environment Variables (.env)
+
 ```env
 # Required Supabase Configuration
 SUPABASE_URL=your_supabase_project_url
@@ -114,7 +115,9 @@ COLLECTION_INTERVAL=2.0
 ```
 
 ### Supabase Schema
+
 The system expects these tables in your Supabase database:
+
 - `vehicle_profiles` - Vehicle information
 - `sensor_data` - Historical sensor readings
 - `sensor_data_realtime` - Latest readings for WebSocket
@@ -122,15 +125,17 @@ The system expects these tables in your Supabase database:
 ## 🚦 Migration Process
 
 ### Step 1: Preparation
+
 ```bash
 # Check current system
 python src/cloud_migration_helper.py --report
 
-# Install cloud dependencies  
+# Install cloud dependencies
 python src/cloud_migration_helper.py --install-deps
 ```
 
 ### Step 2: Configuration
+
 ```bash
 # Create Supabase project (on supabase.com)
 # Get your project URL and anon key
@@ -141,6 +146,7 @@ python src/cloud_migration_helper.py --create-env
 ```
 
 ### Step 3: Verification
+
 ```bash
 # Test everything is ready
 python src/cloud_migration_helper.py --check
@@ -150,6 +156,7 @@ python src/cloud_migration_helper.py --test-connection
 ```
 
 ### Step 4: Launch Cloud System
+
 ```bash
 # Start cloud web server
 python src/cloud_web_server.py &
@@ -162,21 +169,25 @@ python src/cloud_collector_daemon.py
 
 ### Common Issues
 
-**"Cloud storage not available"**
+#### "Cloud storage not available"
+
 - Install supabase: `pip install supabase>=2.0.0`
 - Check .env file has correct SUPABASE_URL and SUPABASE_KEY
 
-**"Cloud connection failed"**  
+#### "Cloud connection failed"
+
 - Verify Supabase credentials are correct
 - Check internet connection
 - Ensure Supabase project is active
 
-**"No vehicle data"**
+#### "No vehicle data"
+
 - Start the cloud collector daemon first
 - Check OBD-II adapter is connected
 - Wait a few minutes for data collection
 
 ### Validation Commands
+
 ```bash
 # Full system check
 python src/cloud_migration_helper.py
@@ -191,29 +202,32 @@ python src/cloud_migration_helper.py --check
 ## 🌟 Cloud Advantages
 
 ### For Development
+
 - **Real-time data** for immediate testing
 - **Cloud ML processing** with more power
 - **Multi-device access** to same data
 - **Automatic scaling** as you add vehicles
 
 ### For Production
+
 - **Fleet management** capabilities
 - **Centralized monitoring** dashboard
 - **Reliable cloud backups**
 - **Enhanced analytics** across all vehicles
 
 ### For Deployment
+
 - **Vercel frontend** + **Supabase backend** = Full cloud stack
 - **No local database** management needed
 - **Automatic updates** and synchronization
 - **Professional-grade** infrastructure
 
-## 🎉 Ready to Go Cloud!
+## 🎉 Ready to Go Cloud
 
 Your vehicle diagnostic system is now cloud-ready! The new architecture provides:
 
 - ✅ **Real-time cloud sync** for immediate data access
-- ✅ **Scalable infrastructure** that grows with your needs  
+- ✅ **Scalable infrastructure** that grows with your needs
 - ✅ **Enhanced ML capabilities** with cloud processing
 - ✅ **Fleet management** for multiple vehicles
 - ✅ **Professional deployment** ready for production
