@@ -1,8 +1,8 @@
-# 🚗 Professional Vehicle Diagnostic System - Complete Reference Guide
+# 🚗 AutoPulse Vehicle Diagnostic System - Quick Reference Guide
 
-> **Enterprise-grade autonomous vehicle data collection and analysis platform**
+> **Cloud-based ML vehicle health monitoring with real-time predictions**
 >
-> Version 3.0.0 Professional | Updated October 29, 2025
+> Version 4.0.0 | Updated November 10, 2025
 
 ---
 
@@ -11,994 +11,719 @@
 **🚀 Fastest Way to Get Started:**
 
 ```bash
-# One-time setup (5 minutes)
-cd ~/vehicle_diagnostic_system
-./install_auto_start.sh
+# 1. Start the data collector (terminal 1)
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src
+python3 cloud_collector_daemon_pro.py
 
-# Daily usage (2 steps)
-1. Turn on car 🔑
-2. Connect OBD scanner 🔌
-3. Open http://localhost:3000 💻
+# 2. That's it! System automatically:
+✅ Detects OBD connection
+✅ Identifies your vehicle
+✅ Collects sensor data (30+ parameters)
+✅ Runs ML predictions (NORMAL/ADVISORY/WARNING/CRITICAL)
+✅ Stores to Supabase cloud database
 ```
 
-**That's it!** System auto-starts, detects car, collects data, runs ML predictions, and streams live to dashboard! ✨
+**What you need:**
 
-**📖 For detailed guide, see:** [Complete Workflow Guide](#-complete-workflow-guide-october-2025)
+- 🔑 Car ignition ON
+- 🔌 OBD-II adapter connected
+- 📡 Internet connection (for Supabase)
 
 ---
 
 ## 📚 Table of Contents
 
-- [⚡ Quick Start](#-quick-start-new-users-start-here)
-- [🚀 Quick Start Guide](#-quick-start-guide)
-- [🛠️ Professional Script Reference](#️-professional-script-reference)
-- [🔌 OBD-II Adapter Configuration](#-obd-ii-adapter-configuration)
-- [📊 Data Collection Methods](#-data-collection-methods)
-- [💾 Database Management](#-database-management)
-- [📈 Data Analysis & Export](#-data-analysis--export)
-- [🖥️ System Monitoring](#️-system-monitoring)
-- [🔧 Advanced Configuration](#-advanced-configuration)
-- [🐛 Professional Troubleshooting](#-professional-troubleshooting)
-- [🌐 Network & Connectivity](#-network--connectivity)
-- [📋 Command Reference](#-command-reference)
-- [🚀 Complete Workflow Guide](#-complete-workflow-guide-october-2025)
+1. [Quick Start](#-quick-start-new-users-start-here)
+2. [System Architecture](#️-system-architecture)
+3. [Data Collection](#-data-collection)
+4. [Machine Learning Pipeline](#-machine-learning-pipeline)
+5. [Cloud Database (Supabase)](#️-cloud-database-supabase)
+6. [OBD-II Adapter Setup](#-obd-ii-adapter-setup)
+7. [Troubleshooting](#-troubleshooting)
+8. [Command Reference](#-command-reference)
 
 ---
 
-## 🏆 Hybrid Vehicle Identification System
+## 🏗️ System Architecture
 
-### **VIN-based Identification**
+### Current System Components
 
-The system now automatically attempts VIN retrieval and decoding:
+```text
+┌──────────────────────────────────────────────────────────┐
+│ Raspberry Pi + OBD-II Scanner                            │
+│   └─ cloud_collector_daemon_pro.py                       │
+│      • Reads 30+ OBD sensors every 1 second              │
+│      • Calculates 3 real-time features                   │
+│      • Auto-labels health status (stress scoring)        │
+│      • Runs ML predictions every 9 seconds               │
+└──────────────────┬───────────────────────────────────────┘
+                   │
+                   ↓
+┌──────────────────────────────────────────────────────────┐
+│ Supabase Cloud Database (PostgreSQL)                     │
+│   • sensor_data (historical time-series)                 │
+│   • sensor_data_realtime (latest readings)               │
+│   • ml_predictions (health predictions)                  │
+│   • vehicles (car profiles)                              │
+└──────────────────┬───────────────────────────────────────┘
+                   │
+                   ↓
+┌──────────────────────────────────────────────────────────┐
+│ Machine Learning (Random Forest)                         │
+│   • 38 features (28 raw + 10 engineered)                 │
+│   • 4-class classification (NORMAL/ADVISORY/WARNING/     │
+│     CRITICAL)                                            │
+│   • 94-96% accuracy                                      │
+│   • <15ms prediction latency                             │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Key Features
+
+- ✅ **Cloud-First**: All data stored in Supabase (no local SQLite)
+- ✅ **Real-Time ML**: Predictions every 9 seconds during driving
+- ✅ **Auto-Labeling**: Health status computed using 9-factor stress scoring
+- ✅ **Multi-Vehicle**: Supports unlimited vehicles with automatic detection
+- ✅ **Production-Ready**: Runs 24/7 with auto-reconnect
+
+---
+
+## 📊 Data Collection
+
+### Main Data Collector Script
+
+**File**: `src/cloud_collector_daemon_pro.py`
+
+**Start Collection:**
+
+```bash
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src
+python3 cloud_collector_daemon_pro.py
+```
+
+**What It Does:**
+
+1. **Connects to OBD-II** (Bluetooth `/dev/rfcomm0` or USB `/dev/ttyUSB*`)
+2. **Detects Vehicle** (VIN or ECU fingerprint)
+3. **Collects Data** (30+ sensors every 1 second)
+4. **Calculates Features**:
+   - Load/RPM ratio (engine efficiency)
+   - Temperature gradient (overheating detection)
+   - Fuel efficiency (L/100km)
+5. **Auto-Labels Health** (stress scoring algorithm)
+6. **Uploads to Cloud** (batches of 3 readings)
+7. **Runs ML Predictions** (every 3rd batch)
+
+### 30+ OBD-II Parameters Collected
+
+**Core Engine (8):**
+
+- RPM, Speed, Coolant Temp, Engine Load
+- Intake Temp, Timing Advance, Run Time, Absolute Load
+
+**Fuel System (7):**
+
+- Fuel Level, Fuel Pressure, Throttle Position
+- Short/Long Fuel Trim (Bank 1 & 2)
+
+**Air Intake (3):**
+
+- MAF (Mass Air Flow), Intake Pressure, Barometric Pressure
+
+**Emissions (3):**
+
+- O2 Sensors (B1S1, B1S2), Catalyst Temperature
+
+**Electrical (1):**
+
+- Control Module Voltage (battery health)
+
+**Diagnostics (5):**
+
+- DTC Count, MIL Status, Distance with MIL
+- Fuel Status, Ambient Air Temp
+
+### Live Monitoring
+
+**Terminal Output:**
+
+```text
+📊 LIVE CLOUD DATA COLLECTION ACTIVE
+======================================================================
+#      RPM     Temp    Load   Speed   Status      Quality
+----------------------------------------------------------------------
+    1:    750    85.0°C  28.5%   0.0    🟢NORMAL     0.85
+    2:   1200    87.2°C  35.1%  15.3    🟢NORMAL     0.88
+    3:   2500    92.5°C  52.3%  45.7    ⚠️ADVISORY    0.92
+```
+
+**Log Files:**
+
+```bash
+# View real-time logs
+tail -f logs/cloud_collector.log
+
+# Check statistics
+grep "Batch stored" logs/cloud_collector.log | wc -l  # Total batches
+```
+
+---
+
+## 🤖 Machine Learning Pipeline
+
+### Model Architecture
+
+**Type**: Random Forest Classifier (200 trees)
+**Classes**: 4 (NORMAL / ADVISORY / WARNING / CRITICAL)
+**Accuracy**: 94-96%
+**Features**: 38 total
+
+### Training Workflow
+
+#### Step 1: Analyze Data Quality
+
+```bash
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src/ml
+python3 analyze_data_quality.py
+```
+
+**Output:**
+
+- Total records in Supabase
+- NULL value distribution
+- Health status distribution
+- Recommendations for training
+
+#### Step 2: Fetch & Clean Training Data
+
+```bash
+python3 fetch_training_data.py
+```
+
+**What it does:**
+
+- Downloads all sensor data from Supabase
+- Filters records with ≤2 NULL values
+- Saves to `data/ml/clean_training_data.csv`
+- Typically keeps 70-80% of raw data
+
+#### Step 3: Train Random Forest Model
+
+```bash
+python3 train_random_forest.py
+```
+
+**Process:**
+
+1. Load clean data
+2. Engineer 7 additional features
+3. Split 80/20 train/test
+4. Scale features (StandardScaler)
+5. Train Random Forest (200 trees)
+6. Evaluate performance
+7. Save model files:
+   - `models/vehicle_health_rf_model_4class.pkl`
+   - `models/scaler_4class.pkl`
+   - `models/model_metadata_4class.json`
+
+#### Step 4: Test Predictions
+
+```bash
+python3 predict_health.py
+```
+
+**Shows:**
+
+- Latest sensor readings
+- ML prediction (NORMAL/ADVISORY/WARNING/CRITICAL)
+- Confidence score
+- Probability distribution
+- Recommended actions
+
+### Feature Engineering
+
+**Real-Time Features (3)** - calculated during collection:
+
+1. **load_rpm_ratio**: Engine efficiency metric
+2. **temp_gradient**: Overheating detection (°C/min)
+3. **fuel_efficiency**: Real consumption (L/100km)
+
+**Training Features (7)** - calculated during model training: 4. **rpm_load_ratio**: Inverse efficiency 5. **temp_efficiency**: Load vs temperature 6. **speed_throttle_ratio**: Throttle efficiency 7. **high_rpm**: Binary flag (>3000 RPM) 8. **low_speed**: Binary flag (<20 km/h) 9. **high_throttle**: Binary flag (>70%) 10. **voltage_health**: Binary flag (12.5-14.5V)
+
+**Total**: 28 raw OBD + 10 engineered = **38 features**
+
+### Health Status Scoring
+
+**Multi-Factor Stress Algorithm** (9 factors, 0-15 points):
+
+1. **Engine Load** (0-3 pts) - Primary indicator
+2. **RPM vs Load Mismatch** (0-2 pts) - Inefficiency
+3. **Temperature Stress** (0-3 pts) - Overheating
+4. **Voltage Issues** (0-2 pts) - Electrical health
+5. **Fuel Trim** (0-2 pts) - Combustion efficiency
+6. **O2 Sensor** (0-1 pt) - Emissions
+7. **Diagnostic Codes** (0-2 pts) - DTCs
+8. **Check Engine Light** (0-2 pts) - MIL status
+9. **Distance with MIL** (0-1 pt) - Ignored warnings
+
+**Classification:**
+
+- **NORMAL** (0-2 points): Healthy operation
+- **ADVISORY** (3-5 points): Monitor closely
+- **WARNING** (6-9 points): Attention needed
+- **CRITICAL** (10+ points or override): Immediate action
+
+**Critical Overrides** (bypass scoring):
+
+- Coolant temp > 110°C
+- Voltage < 11V
+- DTC count > 10
+- Engine load > 95%
+
+---
+
+## ☁️ Cloud Database (Supabase)
+
+### Connection Info
+
+**URL**: `https://qimiewqthuhmofjhzrrb.supabase.co`
+**Database**: PostgreSQL (cloud-hosted)
+
+### Tables
+
+#### 1. `sensor_data` - Historical Time-Series
+
+- All sensor readings (every 1 second)
+- 30+ columns for OBD parameters
+- Auto-labeled health_status
+- Timestamp indexed for fast queries
+
+#### 2. `sensor_data_realtime` - Latest Snapshot
+
+- One row per vehicle
+- Updated every batch (3 seconds)
+- Used for dashboard live view
+
+#### 3. `ml_predictions` - Model Predictions
+
+- Prediction results every 9 seconds
+- Stores confidence scores
+- Links to sensor_data records
+
+#### 4. `vehicles` - Car Profiles
+
+- Vehicle identification
+- Make, model, year
+- VIN or ECU signature
+
+### Manual Queries
+
+**Python:**
 
 ```python
-# VIN format: 1HGBH41JXMN109186
-# Positions: WMI(1-3) + VDS(4-8) + VIS(9-17)
+from supabase import create_client
+
+SUPABASE_URL = "https://qimiewqthuhmofjhzrrb.supabase.co"
+SUPABASE_KEY = "your_key_here"
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# Get latest 10 readings
+response = supabase.table('sensor_data') \
+    .select('*') \
+    .order('timestamp', desc=True) \
+    .limit(10) \
+    .execute()
+
+print(response.data)
 ```
 
-**Supported Manufacturers**: 50+ including Honda, Toyota, Ford, Chevrolet, BMW, Mercedes, etc.
+**Check Scripts:**
 
-### **How it Works**
-
-1. 🔍 **VIN Retrieval**: Attempts to read VIN from vehicle's ECU
-2. 🧠 **VIN Decoding**: Extracts manufacturer, year, model details
-3. 🔄 **Fallback**: Uses ECU cryptographic fingerprint if VIN unavailable
-4. ✅ **Profile Creation**: Creates enhanced vehicle profile with all available data
-
-### **Examples**
-
-```
-VIN: 1HGBH41JXMN109186 → Honda 2021
-VIN: 1G1ZT53806F109149 → Chevrolet 2006
-No VIN? → ECU fingerprint: SHA256(protocols+pids)
+```bash
+# Verify Supabase connection
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/scripts
+python3 check_supabase_data.py
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## 🔌 OBD-II Adapter Setup
 
-### **🎯 NEW: Automated Workflow (Recommended for Daily Use)**
+### Supported Adapters
 
-**Option 1: Full Auto-Start (Production)**
+| Type                 | Connection       | Port                           | Auto-Detect |
+| -------------------- | ---------------- | ------------------------------ | ----------- |
+| **Bluetooth OBD-II** | ELM327 Bluetooth | `/dev/rfcomm0`                 | ✅ Yes      |
+| **USB OBD-II**       | USB serial       | `/dev/ttyUSB*`, `/dev/ttyACM*` | ✅ Yes      |
 
-One-time installation:
+### Bluetooth Setup (ELM327)
 
-```bash
-cd ~/vehicle_diagnostic_system
-./install_auto_start.sh
-```
+**MAC Address**: `00:1D:A5:68:98:8A`
 
-✅ **What this does:**
-
-- Installs systemd service for auto-start on RPI boot
-- Starts all backend servers automatically
-- Runs data collector daemon (waits for OBD connection)
-- Enables real-time ML predictions
-- Streams data to Autopulse dashboard
-
-📱 **Daily usage after installation:**
-
-1. Turn on car 🔑
-2. Connect OBD scanner 🔌
-3. Open http://localhost:3000 💻
-
-That's it! Everything else is automatic! ✨
-
-**Manage the service:**
+**One-Time Pairing:**
 
 ```bash
-# Check status
-sudo systemctl status vehicle-diagnostic
-
-# View logs
-sudo journalctl -u vehicle-diagnostic -f
-
-# Stop/restart
-sudo systemctl stop vehicle-diagnostic
-sudo systemctl restart vehicle-diagnostic
-```
-
-**Option 2: Manual Start (Development/Testing) ⭐ RECOMMENDED FOR DEVELOPMENT**
-
-**🔧 Why Use Manual Mode During Development:**
-
-✅ **Full Control** - Start/stop whenever you want, no background service  
-✅ **Easier Debugging** - See all output in terminal, stop and restart quickly  
-✅ **Faster Iteration** - Make changes, restart with one command, test immediately  
-✅ **No Sudo Required** - No root permissions needed, simpler to manage
-
-**Quick Start:**
-
-```bash
-cd ~/vehicle_diagnostic_system
-./auto_start_complete.sh
-```
-
-This starts:
-
-- Flask API (port 5000) - ML predictions
-- WebSocket server (port 8080) - Real-time streaming
-- Data collector daemon - Waits for OBD connection
-
-**Development Iteration Cycle:**
-
-```bash
-# 1. Stop the system
-./stop_system.sh
-
-# 2. Edit your code (VSCode, nano, etc.)
-nano web_server.py
-
-# 3. Restart the system
-./auto_start_complete.sh
-
-# 4. Test your changes
-curl http://localhost:5000/api/predict
-tail -f logs/collector_daemon.log
-```
-
-**Component-by-Component Testing:**
-
-If you only want to test specific components:
-
-```bash
-# Just Flask API (ML predictions)
-python3 web_server.py
-
-# Just WebSocket (data streaming)
-python3 websocket_server.py
-
-# Just Data Collector (OBD reading)
-python3 src/automated_car_collector_daemon.py --interactive
-```
-
-**Stop Everything:**
-
-```bash
-./stop_system.sh
-
-# Or if stuck, force kill:
-pkill -f "web_server.py"
-pkill -f "websocket_server.py"
-pkill -f "automated_car_collector_daemon"
-```
-
-**📊 Development vs Production Comparison:**
-
-| Feature               | Development (Manual)       | Production (Auto)    |
-| --------------------- | -------------------------- | -------------------- |
-| Start command         | `./auto_start_complete.sh` | Automatic on boot    |
-| Stop command          | `./stop_system.sh`         | `systemctl stop`     |
-| Restart after changes | Quick & easy ✅            | Need service restart |
-| See errors            | Terminal output ✅         | Check logs           |
-| Debugging             | Easy ✅                    | Harder               |
-| Control               | Full control ✅            | Limited              |
-| Sudo required         | No ✅                      | Yes (for setup)      |
-| Auto-start on boot    | No                         | Yes ✅               |
-| **Good for testing**  | ✅ **Perfect**             | ❌ Overkill          |
-| **Good for demo**     | ⚠️ OK                      | ✅ **Perfect**       |
-
-**🎯 When to Switch to Option 1 (Auto-Start):**
-
-Switch to systemd auto-start when:
-
-- ✅ You're done with major development
-- ✅ Ready for thesis demonstration
-- ✅ Want to show it to your professor
-- ✅ Need it to "just work" without manual commands
-- ✅ Deploying for long-term use in your car
-
-Then run: `./install_auto_start.sh`
-
-Stop with: `./stop_system.sh` (or use force kill commands above if needed)
-
-### **Prerequisites Verification**
-
-```bash
-# Verify Python environment is ready
-cd ~/vehicle_diagnostic_system
-source .venv/bin/activate
-python3 --version  # Should be 3.9+
-
-# Check core dependencies
-pip show obd pandas openpyxl numpy matplotlib seaborn supabase
-```
-
-### **🔄 Virtual Environment (UNIFIED)**
-
-**✅ Single Environment Setup Complete (Updated October 2025)**
-
-- **Location**: `/home/rocketeers/vehicle_diagnostic_system/.venv/`
-- **Python Version**: 3.11.2
-- **Packages**: All dependencies consolidated from previous environments
-- **Status**: Isolated environment (no system packages pollution)
-
-**Key Installed Packages:**
-
-- `obd` 0.7.3 - OBD-II communication library
-- `pandas` 2.2.3 - Data analysis and manipulation
-- `numpy` 2.3.2 - Numerical computing
-- `matplotlib` 3.10.6 - Plotting and visualization
-- `seaborn` 0.13.2 - Statistical data visualization
-- `openpyxl` 3.1.5 - Excel file support
-- `supabase` - Cloud database integration
-
-**Activation Command:**
-
-```bash
-cd ~/vehicle_diagnostic_system && source .venv/bin/activate
-```
-
-### **🎓 Legacy: Manual Data Collection Start**
-
-```bash
-# Professional Interactive Mode (Recommended for testing)
-cd ~/vehicle_diagnostic_system/src
-python3 automated_car_collector_daemon.py --interactive
-
-# Professional Daemon Mode (Production deployment)
-cd ~/vehicle_diagnostic_system/src
-python3 automated_car_collector_daemon.py --daemon
-```
-
-### **Essential First-Run Checklist**
-
-- ✅ Vehicle ignition ON (engine running preferred)
-- ✅ OBD-II adapter connected to diagnostic port
-- ✅ Virtual environment activated
-- ✅ Bluetooth paired or USB adapter detected
-
----
-
-## 🛠️ Professional Script Reference
-
-### **Core Data Collection Scripts**
-
-| Script                              | Purpose               | Professional Features                                     | Usage                 |
-| ----------------------------------- | --------------------- | --------------------------------------------------------- | --------------------- |
-| `automated_car_collector_daemon.py` | **Primary Collector** | Universal adapter support, ML features, health monitoring | Production deployment |
-| `universal_obd_checker.py`          | **Adapter Testing**   | Multi-protocol detection, signal quality analysis         | Hardware validation   |
-| `simple_ecu_test.py`                | **ECU Communication** | Fast connectivity tests, protocol identification          | Quick diagnostics     |
-
-### **Advanced Analysis & Management**
-
-| Script                      | Purpose             | Professional Features                                       | Usage                |
-| --------------------------- | ------------------- | ----------------------------------------------------------- | -------------------- |
-| `enhanced_database.py`      | **Database Engine** | Connection pooling, auto-migration, WAL mode                | Backend operations   |
-| `export_data.py`            | **Data Analysis**   | 6 export formats, date filtering, advanced analytics        | Report generation    |
-| `check_collector_status.py` | **System Monitor**  | Performance metrics, health diagnostics, recommendations    | System monitoring    |
-| `clear_database.py`         | **Data Management** | Car profile management, selective deletion, safety features | Database maintenance |
-
----
-
-## 🔌 OBD-II Adapter Configuration
-
-### **Universal Adapter Support Matrix**
-
-| Adapter Type         | Connection                     | Auto-Detection    | Professional Features      |
-| -------------------- | ------------------------------ | ----------------- | -------------------------- |
-| **USB OBD-II**       | `/dev/ttyUSB*`, `/dev/ttyACM*` | ✅ Automatic      | Multiple baud rate support |
-| **Bluetooth OBD-II** | `/dev/rfcomm*`                 | ✅ Automatic      | Wireless connectivity      |
-| **WiFi OBD-II**      | Network-based                  | 🔄 Future support | Cloud integration ready    |
-
-### **Adapter Detection & Testing**
-
-```bash
-# Professional adapter detection
-python3 universal_obd_checker.py
-
-# Quick ECU communication test
-python3 simple_ecu_test.py
-
-# USB adapter verification
-ls -la /dev/ttyUSB* /dev/ttyACM*
-
-# Bluetooth adapter status
-ls -la /dev/rfcomm* && rfcomm show
-```
-
-### **🔧 IMPORTANT: OBD-II Adapter Information**
-
-**⚠️ DO NOT DELETE - CRITICAL ADAPTER INFO ⚠️**
-
-```
-OBD-II Bluetooth Adapter MAC Address: 00:1D:A5:68:98:8A
-Device Type: Bluetooth OBD-II Scanner
-Connection: /dev/rfcomm0 (after pairing)
-```
-
-### **🧠 Smart Auto-Connection (NEW FEATURE!)**
-
-**🎉 Your scripts now automatically handle Bluetooth connection!**
-
-- ✅ No manual `rfcomm bind` commands needed
-- ✅ Automatic reconnection on reboot/power cycle
-- ✅ Built into all diagnostic scripts
-- ✅ Works with: `universal_obd_checker.py`, `simple_ecu_test.py`, `automated_car_collector_daemon.py`
-
-**How it works:**
-
-1. Scripts detect if OBD adapter needs connection
-2. Automatically run `sudo rfcomm bind 0 00:1D:A5:68:98:8A`
-3. Verify communication with adapter
-4. Ready for vehicle diagnostics!
-
-**Just run your scripts normally - connection is automatic!**
-
-### **Connection Troubleshooting Commands**
-
-```bash
-# USB permissions (if needed)
-sudo usermod -a -G dialout $USER && echo "Log out and back in"
-
-# Bluetooth pairing (if needed) - Use MAC: 00:1D:A5:68:98:8A
+# Pair with adapter
 sudo bluetoothctl
-# > scan on
-# > pair 00:1D:A5:68:98:8A
-# > trust 00:1D:A5:68:98:8A
-# > exit
+> scan on
+> pair 00:1D:A5:68:98:8A
+> trust 00:1D:A5:68:98:8A
+> exit
 
-# Create rfcomm serial device (REQUIRED for OBD-II communication)
+# Create serial port
 sudo rfcomm bind 0 00:1D:A5:68:98:8A
 
-# Verify rfcomm device created
+# Verify connection
 ls -la /dev/rfcomm0
+```
 
-# Test OBD-II communication
+**Note**: The collector script auto-reconnects, so you only need to pair once!
+
+### Test OBD Connection
+
+**Quick Test:**
+
+```bash
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src
 python3 -c "
-import serial
-ser = serial.Serial('/dev/rfcomm0', 38400, timeout=3)
-ser.write(b'ATI\\r')
-print(ser.read(20))  # Should show ELM327 version
-ser.close()
+import obd
+conn = obd.OBD('/dev/rfcomm0')
+if conn.is_connected():
+    print('✅ OBD Connected!')
+    print(f'Protocol: {conn.protocol_name()}')
+    print(f'Supported: {len(conn.supported_commands)} commands')
+else:
+    print('❌ Connection failed')
 "
-
-# Reset all Bluetooth pairings (complete removal)
-sudo bluetoothctl
-# > paired-devices  # List all paired devices
-# > remove XX:XX:XX:XX:XX:XX  # Remove each device individually
-# > exit
-
-# Or complete Bluetooth cache reset (removes ALL pairings)
-sudo rm -rf /var/lib/bluetooth/*
-sudo systemctl restart bluetooth
-
-# Monitor connection events
-sudo dmesg -w | grep -E "(tty|rfcomm|obd)"
 ```
 
 ---
 
-## 📊 Data Collection Methods
+## 🐛 Troubleshooting
 
-### **Professional Screen Method (Development)**
+### Common Issues
 
-```bash
-# Start development session
-screen -S vehicle_diagnostics
-cd ~/vehicle_diagnostic_system
-source .venv/bin/activate
-cd src
-python3 automated_car_collector_daemon.py --interactive
+#### 1. No OBD Connection
 
-# Detach (keeps running): Ctrl+A then D
-# Reconnect: screen -r vehicle_diagnostics
-# Terminate: screen -S vehicle_diagnostics -X quit
-```
+**Symptoms**: "Could not connect to OBD-II adapter"
 
-### **Professional Configuration Options**
+**Solutions:**
 
 ```bash
-# Custom configuration file
-python3 automated_car_collector_daemon.py --daemon --config config/production.json
+# Check if device exists
+ls -la /dev/rfcomm0  # Bluetooth
+ls -la /dev/ttyUSB*  # USB
 
-# Verbose diagnostic mode
-python3 automated_car_collector_daemon.py --interactive --verbose
+# Verify car is ON
+# (ignition must be ON, engine running preferred)
 
-# Performance monitoring mode
-python3 automated_car_collector_daemon.py --daemon --config config/high_performance.json
+# Check Bluetooth connection
+sudo rfcomm show
+
+# Rebind if needed
+sudo rfcomm release 0
+sudo rfcomm bind 0 00:1D:A5:68:98:8A
 ```
 
-### **Advanced Collection Features**
+#### 2. Supabase Connection Failed
 
-- 🎯 **Intelligent Vehicle Recognition**: Hybrid VIN + ECU fingerprint identification
-- 🆔 **VIN Decoding**: Automatic manufacturer, year, and vehicle details extraction
-- ⚡ **Real-time Quality Assessment**: Data integrity scoring
-- 🧠 **ML Feature Extraction**: Engine stress, efficiency metrics
-- 🏥 **Health Status Analysis**: NORMAL/ADVISORY/WARNING/CRITICAL
-- 📈 **Performance Monitoring**: Readings per second, error rates
-- 🔄 **Universal Compatibility**: Works with all vehicles (VIN + fallback ECU method)
+**Symptoms**: "Error storing sensor data"
 
----
-
-## 💾 Database Management
-
-### **Professional Database Operations**
+**Solutions:**
 
 ```bash
-# Enhanced database management
-python3 enhanced_database.py
+# Check internet connection
+ping -c 3 google.com
 
-# Car profile management
-python3 clear_database.py
-# Options: Clear all data, manage car profiles, merge profiles
+# Verify Supabase credentials in code
+# src/supabase_direct_storage.py
 
-# Database health check
-python3 check_collector_status.py --full
+# Test connection
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/scripts
+python3 check_supabase_data.py
 ```
 
-### **Database Migration & Optimization**
+#### 3. Low Data Quality
+
+**Symptoms**: `data_quality < 0.5`
+
+**Solutions:**
+
+- Ensure car engine is running (not just ignition)
+- Check OBD adapter connection is secure
+- Try different OBD port (some cars have multiple)
+- Verify adapter is ELM327 v1.5 or higher
+
+#### 4. ML Model Not Found
+
+**Symptoms**: "Model not found" or "ML prediction unavailable"
+
+**Solutions:**
 
 ```bash
-# The system automatically handles:
-# ✅ Schema migrations
-# ✅ Connection pooling
-# ✅ WAL mode optimization
-# ✅ Integrity verification
-# ✅ Backup management
+# Check if model files exist
+ls -la /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/models/
+
+# Should see:
+# vehicle_health_rf_model_4class.pkl
+# scaler_4class.pkl
+# model_metadata_4class.json
+
+# If missing, train model:
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src/ml
+python3 train_random_forest.py
 ```
 
----
+### Debug Mode
 
-## 📈 Data Analysis & Export
-
-### **Advanced Export Options**
+**Enable verbose logging:**
 
 ```bash
-# Professional data export tool
-python3 export_data.py
+# Start collector with debug output
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src
+python3 cloud_collector_daemon_pro.py 2>&1 | tee debug.log
 
-# Available formats:
-# 1. Excel (XLSX) with multiple sheets
-# 2. CSV for data analysis
-# 3. JSON for API integration
-# 4. Statistical summary reports
-# 5. Car profile comparisons
-# 6. Time-series analysis
+# Watch logs in real-time
+tail -f logs/cloud_collector.log
 ```
-
-### **Export Features**
-
-- 📅 **Date Range Filtering**: Custom time periods
-- 🚗 **Multi-Vehicle Support**: Compare different cars
-- 📊 **Statistical Analysis**: Automatic trend detection
-- 🎨 **Professional Formatting**: Publication-ready reports
-- 🔄 **Batch Export**: Multiple formats simultaneously
-
----
-
-## 🖥️ System Monitoring
-
-### **Comprehensive Status Dashboard**
-
-```bash
-# Professional system monitor
-python3 check_collector_status.py
-
-# Available modes:
---quick     # Fast status overview
---full      # Comprehensive diagnostics
---json      # API-friendly output
---watch     # Real-time monitoring
-```
-
-### **System Health Metrics**
-
-- 🏥 **System Health**: CPU, memory, disk usage
-- 🔌 **Connection Status**: OBD adapter health
-- 📊 **Data Quality**: Success rates, error trends
-- ⚡ **Performance**: Throughput, latency metrics
-- 🎯 **Recommendations**: Actionable improvement suggestions
-
----
-
-## 🔧 Advanced Configuration
-
-### **Professional Configuration Files**
-
-```bash
-# Create custom configurations
-mkdir -p config/
-
-# Example: High-performance config
-cat > config/high_performance.json << 'EOF'
-{
-  "collection_interval": 0.5,
-  "batch_size": 20,
-  "quality_threshold": 0.8,
-  "max_consecutive_errors": 20,
-  "advanced_ml_features": true,
-  "performance_monitoring": true
-}
-EOF
-```
-
-### **Environment Variables**
-
-```bash
-# Production environment setup
-export VDS_ENV=production
-export VDS_LOG_LEVEL=INFO
-export VDS_DB_PATH=/var/lib/vehicle_data/production.db
-export VDS_CONFIG_PATH=/etc/vehicle_diagnostics/config.json
-```
-
----
-
-## 🐛 Professional Troubleshooting
-
-### **Common Issues & Solutions**
-
-| Issue                 | Symptoms                    | Professional Solution                        |
-| --------------------- | --------------------------- | -------------------------------------------- |
-| **No OBD Connection** | "No adapter ports detected" | Run `universal_obd_checker.py` for diagnosis |
-| **Low Data Quality**  | Quality scores < 0.5        | Check vehicle ignition, adapter connection   |
-| **Import Errors**     | `ModuleNotFoundError`       | Verify virtual environment activation        |
-| **Database Errors**   | Connection failures         | Run database integrity check                 |
-
-### **Professional Diagnostic Commands**
-
-```bash
-# Complete system diagnostic
-python3 check_collector_status.py --full
-
-# OBD adapter deep analysis
-python3 universal_obd_checker.py
-
-# Database integrity check
-python3 enhanced_database.py
-
-# Performance profiling
-python3 automated_car_collector_daemon.py --daemon --verbose
-```
-
-### **Advanced Debugging**
-
-```bash
-# Enable debug logging for all components
-export PYTHONPATH=/home/rocketeers/vehicle_diagnostic_system/src
-python3 -c "
-import logging
-logging.basicConfig(level=logging.DEBUG)
-# Run your diagnostic script here
-"
-
-# Memory and performance profiling
-python3 -m cProfile automated_car_collector_daemon.py --daemon
-```
-
----
-
-## 🌐 Network & Connectivity
-
-### **WiFi Management**
-
-```bash
-# Professional network diagnostics
-nmcli device status
-nmcli connection show
-
-# Connect to network
-sudo nmcli device wifi connect "huh" password "luwawsa2025"
-sudo nmcli device wifi connect "PLDTHOMEFIBRGLVZ" password "ALGalvez_261528"
-sudo nmcli device wifi connect "ZTEMU5002AD" password "AdrianGalvez_2025"
-sudo nmcli device wifi connect "WIFI NI BRIAN" password "Brianronnie2019!"
-
-
-# Network performance testing
-ping -c 10 8.8.8.8
-speedtest-cli  # If installed
-```
-
-### **SSH & Remote Access**
-
-```bash
-# Secure remote access
-ssh -o ServerAliveInterval=60 user@vehicle_pi_ip
-
-# Port forwarding for web interfaces
-ssh -L 8080:localhost:8080 user@vehicle_pi_ip
-
-# Remote data collection monitoring
-ssh user@vehicle_pi_ip 'cd vehicle_diagnostic_system/src && python3 check_collector_status.py --json'
-```
-
----
-
-## 🛑 System Shutdown & Restart
-
-### **Quick Shutdown (End of Day)**
-
-```bash
-cd ~/vehicle_diagnostic_system
-./stop_system.sh
-```
-
-✅ **This safely stops:**
-
-- Flask API server (ML predictions)
-- WebSocket server (real-time streaming)
-- OBD data collector daemon
-- React frontend (if running)
-
-### **Verify Everything Stopped**
-
-```bash
-./check_status.sh
-# Should show all services as "STOPPED"
-
-# Or manually check
-ps aux | grep -E "web_server|websocket|collector|react" | grep -v grep
-# (No output = all stopped ✅)
-```
-
-### **Manual Shutdown (If script fails)**
-
-```bash
-# Force stop all services
-pkill -f "web_server.py"
-pkill -f "websocket_server.py"
-pkill -f "automated_car_collector_daemon.py"
-pkill -f "react-scripts"
-pkill -f "npm start"
-
-# Clean up PID files
-rm -f logs/*.pid
-```
-
-### **Restart Tomorrow**
-
-```bash
-# Start backend services + ML + OBD collector
-cd ~/vehicle_diagnostic_system
-./auto_start_complete.sh
-
-# Then start React website (new terminal)
-cd ~/vehicle_diagnostic_system/website
-npm start
-```
-
-Access dashboard: **http://localhost:3000**
-
-### **Your Data is Safe! 📊**
-
-All collected data persists in:
-
-- `src/data/vehicle_diagnostic.db` (SQLite database)
-- Nothing gets deleted when you stop the system
-- ML model automatically reloads on restart (99.94% accuracy)
-- Historical data available in Logs page
-
-### **Before You Leave Checklist**
-
-- [ ] Run `./stop_system.sh`
-- [ ] Verify services stopped with `./check_status.sh`
-- [ ] Car ignition OFF (if connected to OBD)
-- [ ] OBD scanner can be disconnected
-- [ ] SSH connection can be safely closed
-
-### **Service Management Quick Reference**
-
-| Action              | Command                    | When to Use                     |
-| ------------------- | -------------------------- | ------------------------------- |
-| **Stop everything** | `./stop_system.sh`         | End of day, before shutdown     |
-| **Check status**    | `./check_status.sh`        | Verify services running/stopped |
-| **Start backend**   | `./auto_start_complete.sh` | Daily restart, after reboot     |
-| **Start React**     | `cd website && npm start`  | Start dashboard UI              |
-| **Force kill**      | `pkill -f web_server.py`   | If stop script fails            |
-| **View logs**       | `tail -f logs/*.log`       | Troubleshooting                 |
-
-### **Detailed Shutdown Guide**
-
-For complete documentation, see: **SHUTDOWN_GUIDE.md**
 
 ---
 
 ## 📋 Command Reference
 
-### **🆕 Automated System Commands (Recommended)**
+### Data Collection
 
 ```bash
-# One-time installation (enables auto-start on boot)
-./install_auto_start.sh
+# Start main collector
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src
+python3 cloud_collector_daemon_pro.py
 
-# Manual start (all-in-one)
-./auto_start_complete.sh
+# Stop collector (Ctrl+C in terminal)
 
-# Check system status (quick overview of all services)
-./check_status.sh
-
-# Stop all services safely
-./stop_system.sh
-
-# View real-time logs
-tail -f logs/collector_daemon.log
-tail -f logs/flask_server.log
-tail -f logs/websocket_server.log
-
-# Systemd service management
-sudo systemctl status vehicle-diagnostic
-sudo systemctl start vehicle-diagnostic
-sudo systemctl stop vehicle-diagnostic
-sudo systemctl restart vehicle-diagnostic
-sudo journalctl -u vehicle-diagnostic -f
+# View logs
+tail -f logs/cloud_collector.log
 ```
 
-### **One-Line Power Commands**
+### Machine Learning
 
 ```bash
-# Complete environment setup
-cd ~/vehicle_diagnostic_system && source .venv/bin/activate
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src/ml
 
-# Start professional collection with monitoring
-python3 src/automated_car_collector_daemon.py --interactive --verbose | tee logs/collection_$(date +%Y%m%d_%H%M%S).log
+# Analyze data quality
+python3 analyze_data_quality.py
 
-# Generate comprehensive report
-python3 src/check_collector_status.py --full && python3 src/export_data.py
+# Fetch and clean training data
+python3 fetch_training_data.py
 
-# Test ML model performance
-python3 test_ml_model.py
+# Train model
+python3 train_random_forest.py
 
-# Sync data to cloud
-python3 src/sync_to_supabase.py --incremental
+# Test predictions
+python3 predict_health.py
 ```
 
-### **Professional Workflow Examples**
+### Database Management
 
 ```bash
-# 🆕 Modern automated workflow (RECOMMENDED)
-./install_auto_start.sh  # One-time setup
-# Then just: Turn on car → Connect OBD → Done!
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/scripts
 
-# Development workflow
-./auto_start_complete.sh  # Start everything
-tail -f logs/collector_daemon.log  # Monitor
+# Check Supabase data
+python3 check_supabase_data.py
 
-# Legacy manual workflow
-screen -S vds_dev
-cd ~/vehicle_diagnostic_system && source .venv/bin/activate
-python3 src/automated_car_collector_daemon.py --interactive --verbose
-
-# Production deployment (legacy)
-python3 src/automated_car_collector_daemon.py --daemon --config config/production.json
-
-# Data analysis workflow
-python3 src/export_data.py && python3 src/check_collector_status.py --full
+# View vehicle profiles
+# (query vehicles table via Supabase dashboard)
 ```
 
-### **Emergency Commands**
+### System Monitoring
 
 ```bash
-# Kill all collection processes
-pkill -f "automated_car_collector_daemon"
-pkill -f "web_server.py"
-pkill -f "websocket_server.py"
+# View real-time collection
+tail -f /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/logs/cloud_collector.log
 
-# Stop systemd service
-sudo systemctl stop vehicle-diagnostic
+# Count total readings
+grep "Batch stored" logs/cloud_collector.log | wc -l
 
-# Force cleanup all sessions
-screen -wipe
+# Check for errors
+grep "ERROR" logs/cloud_collector.log
 
-# Database emergency backup
-cp src/data/vehicle_data.db src/backups/emergency_$(date +%Y%m%d_%H%M%S).db
-
-# System resource check
-df -h && free -h && ps aux --sort=-%cpu | head -20
-
-# View all running services
-./check_system.sh
+# Monitor system resources
+htop  # CPU/Memory
+df -h  # Disk space
 ```
 
 ---
 
-## 🚀 Complete Workflow Guide (October 2025)
+## 🎯 Quick Workflows
 
-### **📖 Recommended Setup: Fully Automated**
-
-This is the BEST way to use your vehicle diagnostic system for daily use and thesis demonstrations.
-
-**One-Time Setup (5 minutes):**
+### Daily Use (Collect Data)
 
 ```bash
-cd ~/vehicle_diagnostic_system
+# 1. Turn on car ignition
+# 2. Connect OBD adapter
+# 3. Start collector
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src
+python3 cloud_collector_daemon_pro.py
 
-# Install auto-start system
-./install_auto_start.sh
-
-# Verify installation
-sudo systemctl status vehicle-diagnostic
+# 4. Drive normally - data auto-collects!
+# 5. Stop with Ctrl+C when done
 ```
 
-**Daily Usage (2 steps):**
-
-1. **Turn on car** 🔑
-2. **Connect OBD scanner** 🔌
-
-That's it! The system automatically:
-
-- ✅ Detects OBD connection
-- ✅ Recognizes your car
-- ✅ Starts data collection
-- ✅ Runs ML predictions (100% accuracy!)
-- ✅ Streams live data to Autopulse dashboard
-
-**Access Your Dashboard:**
-
-Open browser: **http://localhost:3000**
-
-See:
-
-- Real-time sensor data (RPM, temp, speed, etc.)
-- ML health predictions (NORMAL/ADVISORY/WARNING/CRITICAL)
-- Live charts and graphs
-- Instant maintenance alerts
-- Historical analytics
-
-### **🔧 Alternative: Manual Mode (Development)**
-
-For testing or when you don't want auto-start:
+### Train ML Model (First Time)
 
 ```bash
-# Start everything with one command
-./auto_start_complete.sh
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src/ml
 
-# Monitor logs
-tail -f logs/collector_daemon.log
+# 1. Analyze what data you have
+python3 analyze_data_quality.py
 
-# Stop when done
-./stop_system.sh
+# 2. Fetch and clean data (need 1000+ records)
+python3 fetch_training_data.py
+
+# 3. Train model
+python3 train_random_forest.py
+
+# 4. Test it
+python3 predict_health.py
 ```
 
-### **📊 System Architecture**
-
-```
-RPI Boot → Systemd Service → Auto-start script
-    ↓
-Flask API (port 5000) - ML predictions
-WebSocket (port 8080) - Real-time streaming
-Data Collector Daemon - Waits for OBD
-    ↓
-[You connect OBD scanner to car]
-    ↓
-Auto-detect → Start collection → ML predictions → Live dashboard
-```
-
-### **🎓 Thesis Demonstration Workflow**
-
-**Before Demo:**
+### Retrain Model (After Collecting More Data)
 
 ```bash
-# Verify system is running
-sudo systemctl status vehicle-diagnostic
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src/ml
 
-# Check ML model
-curl http://localhost:5000/api/model/info
+# 1. Fetch updated data
+python3 fetch_training_data.py
+
+# 2. Retrain
+python3 train_random_forest.py
+
+# Model automatically updates!
 ```
 
-**During Demo:**
-
-1. Show automated system (no manual commands!)
-2. Connect OBD scanner to car
-3. Open Autopulse dashboard
-4. Point out real-time updates (1 second intervals)
-5. Show ML predictions (100% accuracy, 97.4% confidence)
-6. Explain cloud integration (Supabase sync)
-7. Show historical data and analytics
-
-**Impressive Features to Highlight:**
-
-- ✅ Fully automated (systemd + event-driven)
-- ✅ Real-time ML predictions (not batch!)
-- ✅ 100% model accuracy on 10,000 test samples
-- ✅ Cloud-connected (local + Supabase)
-- ✅ WebSocket streaming (sub-second latency)
-- ✅ Multi-vehicle support
-- ✅ Production-ready deployment
-
-### **📚 Documentation Files**
-
-| File                     | Purpose                    | When to Read           |
-| ------------------------ | -------------------------- | ---------------------- |
-| **QUICK_START.md**       | Ultra-fast reference       | Daily use              |
-| **WORKFLOW_GUIDE.md**    | Complete 22-page guide     | Full understanding     |
-| **ML_MODEL_REPORT.md**   | Model performance analysis | Thesis writing         |
-| **PROJECT_STRUCTURE.md** | System architecture        | Understanding codebase |
-| **CHEAT_SHEET.md**       | This file!                 | Quick reference        |
-
-### **🔍 Monitoring Commands**
+### Check System Health
 
 ```bash
-# System status overview
-./check_system.sh
+# 1. Check recent data collection
+tail -n 50 /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/logs/cloud_collector.log
 
-# Live logs (all components)
-tail -f logs/*.log
+# 2. Verify Supabase connection
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/scripts
+python3 check_supabase_data.py
 
-# Specific component logs
-tail -f logs/collector_daemon.log    # Data collection
-tail -f logs/flask_server.log        # ML API
-tail -f logs/websocket_server.log    # Real-time streaming
-
-# Systemd service logs
-sudo journalctl -u vehicle-diagnostic -f
-sudo journalctl -u vehicle-diagnostic -n 100
-
-# Process monitoring
-ps aux | grep -E "web_server|websocket|collector"
-```
-
-### **☁️ Cloud Sync (Optional)**
-
-```bash
-# One-time Supabase setup
-# See WORKFLOW_GUIDE.md for detailed instructions
-
-# Manual sync
-python3 src/sync_to_supabase.py --full        # Initial sync
-python3 src/sync_to_supabase.py --incremental # New data only
-
-# Continuous sync (background)
-python3 src/sync_to_supabase.py --continuous --interval 300  # Every 5 min
+# 3. Test ML predictions
+cd /Users/adriangalvez/Thesis/autopulse-vehicle-diagnostic/src/ml
+python3 predict_health.py
 ```
 
 ---
 
-## 🎯 Professional Best Practices
+## 📊 Understanding Output
 
-### **Development Recommendations**
+### Collection Output
 
-1. 🧪 **Always test with** `--interactive` mode first
-2. 📊 **Monitor data quality** with regular status checks
-3. 💾 **Regular database backups** before major changes
-4. 🔄 **Use screen sessions** for development work
-5. 📈 **Export data regularly** for analysis
+```text
+📊 LIVE CLOUD DATA COLLECTION ACTIVE
+======================================================================
+#      RPM     Temp    Load   Speed   Status      Quality
+----------------------------------------------------------------------
+    1:    750    85.0°C  28.5%   0.0    🟢NORMAL     0.85
+```
 
-### **Production Deployment**
+**Columns:**
 
-1. 🚀 **Use daemon mode** for unattended operation
-2. ⚙️ **Configure custom settings** via JSON config files
-3. 📝 **Enable comprehensive logging** with log rotation
-4. 🏥 **Setup health monitoring** with automated alerts
-5. 🔒 **Implement proper security** measures for remote access
+- **#**: Reading number
+- **RPM**: Engine revolutions per minute
+- **Temp**: Coolant temperature (°C)
+- **Load**: Engine load percentage
+- **Speed**: Vehicle speed (km/h)
+- **Status**: Health status (NORMAL/ADVISORY/WARNING/CRITICAL)
+- **Quality**: Data quality score (0.0-1.0)
 
-### **Performance Optimization**
+**Status Icons:**
 
-1. ⚡ **Adjust collection intervals** based on needs
-2. 📦 **Optimize batch sizes** for your hardware
-3. 🎯 **Set quality thresholds** appropriately
-4. 💽 **Monitor disk space** for log files
-5. 🧹 **Regular maintenance** with cleanup scripts
+- 🟢 NORMAL: All systems OK
+- ⚠️ ADVISORY: Monitor closely
+- 🟠 WARNING: Attention needed
+- 🔴 CRITICAL: Immediate action
+
+### ML Prediction Output
+
+```text
+🔮 VEHICLE HEALTH PREDICTION
+============================================================
+📊 CURRENT SENSOR VALUES
+
+   RPM:                1200
+   Speed:              45.3 km/h
+   Coolant Temp:       92.5 °C
+   Engine Load:        52.3 %
+   Voltage:            13.8 V
+
+🎯 PREDICTION RESULTS
+
+   Predicted Health Status: ADVISORY
+   Confidence:              87.3%
+
+   Probability Distribution:
+      NORMAL       9.5%
+      ADVISORY     87.3%
+      WARNING      2.8%
+      CRITICAL     0.4%
+
+💡 INTERPRETATION
+
+   ⚠️ ADVISORY - Vehicle requires attention soon
+      • Coolant temperature elevated - check cooling system
+      • Schedule inspection within 1-2 weeks
+```
 
 ---
 
-**🎊 Professional Vehicle Diagnostic System v3.0**
-**Enterprise-ready autonomous vehicle data collection platform**
+## 📚 Documentation Files
 
-_For support and advanced features, consult the individual script help pages:_
+| File                                | Purpose                           |
+| ----------------------------------- | --------------------------------- |
+| **ML_SYSTEM_DOCUMENTATION.md**      | Complete ML pipeline explanation  |
+| **ENGINE_STRESS_HEALTH_SCORING.md** | Health scoring algorithm details  |
+| **CALCULATED_FEATURES_UPDATE.md**   | Feature engineering documentation |
+| **4CLASS_MODEL_READY.md**           | Model training results            |
+| **CHEAT_SHEET.md**                  | This file - Quick reference       |
 
-```bash
-python3 [script_name].py --help
-```
+---
+
+## 🚀 Best Practices
+
+### Data Collection Best Practices
+
+1. ✅ **Always run with engine ON** (not just ignition)
+2. ✅ **Collect during varied driving** (idle, city, highway)
+3. ✅ **Monitor data quality** (should be >0.7)
+4. ✅ **Check logs regularly** for errors
+5. ✅ **Ensure stable internet** for Supabase uploads
+
+### Machine Learning Best Practices
+
+1. ✅ **Collect 1000+ records** before first training
+2. ✅ **Retrain after 500+ new records** for better accuracy
+3. ✅ **Verify class distribution** (70% NORMAL, 30% others)
+4. ✅ **Monitor prediction confidence** (should be >80%)
+5. ✅ **Save model versions** before retraining
+
+### System Maintenance
+
+1. ✅ **Monitor disk space** (logs can grow)
+2. ✅ **Backup model files** regularly
+3. ✅ **Check Supabase storage** (free tier limits)
+4. ✅ **Update dependencies** periodically
+5. ✅ **Test OBD connection** before long drives
+
+---
+
+**🎊 AutoPulse Vehicle Diagnostic System v4.0**  
+**Cloud-based ML health monitoring with 94-96% accuracy**
+
+_Last Updated: November 10, 2025_  
+_System Status: ✅ Production Ready_
 
 ---
