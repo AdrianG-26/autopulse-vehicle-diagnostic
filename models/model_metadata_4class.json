@@ -7,11 +7,11 @@
     "2": "WARNING",
     "3": "CRITICAL"
   },
-  "training_date": "2025-11-12T15:50:23.110371",
-  "total_samples": 9310,
-  "training_samples": 7448,
-  "testing_samples": 1862,
-  "accuracy": 0.9500537056928035,
+  "training_date": "2025-11-12T17:10:16.527070",
+  "total_samples": 3447,
+  "training_samples": 2757,
+  "testing_samples": 690,
+  "accuracy": 0.9101449275362319,
   "features": [
     "rpm",
     "vehicle_speed",
@@ -48,9 +48,9 @@
     "class_weight": "balanced"
   },
   "class_distribution": {
-    "NORMAL": 7237,
-    "ADVISORY": 1130,
-    "WARNING": 200,
-    "CRITICAL": 743
+    "NORMAL": 2122,
+    "ADVISORY": 817,
+    "WARNING": 193,
+    "CRITICAL": 315
   }
 }

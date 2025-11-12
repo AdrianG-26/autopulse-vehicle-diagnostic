@@ -431,8 +431,8 @@ class ProfessionalCloudCollector:
             stress_score += 3  # Near critical temp
         elif coolant_temp > 100:
             stress_score += 2  # Running hot
-        elif coolant_temp > 95:
-            stress_score += 1  # Warm but manageable
+        elif coolant_temp > 98:
+            stress_score += 1  # Warm but manageable (raised from 95 to avoid false positives at normal idle)
         
         # 4. Voltage Issues (electrical stress)
         voltage = data.get('control_module_voltage', 14)
