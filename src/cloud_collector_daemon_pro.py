@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 try:
     from ml_predictor import get_ml_predictor
     from ml_storage import extend_supabase_storage_with_ml
+    from ml_health_utils import extract_ml_fields_from_prediction
     ML_AVAILABLE = True
 except ImportError as e:
     print(f"⚠️  ML prediction unavailable: {e}")
@@ -600,7 +601,14 @@ class ProfessionalCloudCollector:
                         prediction = self.ml_predictor.predict(latest_reading)
                         
                         if prediction:
-                            # Store prediction to database
+                            # Extract ML fields for database storage
+                            ml_fields = extract_ml_fields_from_prediction(prediction)
+                            
+                            # Attach ML fields to ALL readings in this batch
+                            for reading in batch_data:
+                                reading.update(ml_fields)
+                            
+                            # Store prediction to ml_predictions table (for history)
                             sensor_data_id = None
                             ml_success = self.ml_storage.store_prediction(
                                 self.current_vehicle_id, 
@@ -610,8 +618,8 @@ class ProfessionalCloudCollector:
                             
                             if ml_success:
                                 logger.info(f"🤖 ML Prediction: {prediction['predicted_status']} "
-                                          f"(confidence: {prediction['confidence_score']}%, "
-                                          f"risk: {prediction['failure_risk']})")
+                                          f"(score: {ml_fields['ml_health_score']}/100, "
+                                          f"confidence: {prediction['confidence_score']}%)")
                     except Exception as e:
                         logger.error(f"❌ ML prediction error: {e}")
 

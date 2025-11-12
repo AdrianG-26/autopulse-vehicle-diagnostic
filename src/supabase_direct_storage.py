@@ -169,6 +169,12 @@ class SupabaseDirectStorage:
                     # ML Training (1)
                     'health_status': reading.get('health_status', 0),
                     
+                    # ML Predictions (4)
+                    'ml_health_score': reading.get('ml_health_score'),
+                    'ml_status': reading.get('ml_status'),
+                    'ml_alerts': reading.get('ml_alerts'),
+                    'ml_confidence': reading.get('ml_confidence'),
+                    
                     # Metadata
                     'data_quality_score': reading.get('data_quality', 90),
                     'status': reading.get('status', 'NORMAL')
@@ -222,7 +228,13 @@ class SupabaseDirectStorage:
                 'status': latest_reading.get('status', 'NORMAL'),
                 'health_status': latest_reading.get('health_status', 0),
                 'engine_stress_score': latest_reading.get('engine_stress_score', 0),
-                'data_quality_score': latest_reading.get('data_quality', 90)
+                'data_quality_score': latest_reading.get('data_quality', 90),
+                
+                # ML Predictions (4)
+                'ml_health_score': latest_reading.get('ml_health_score'),
+                'ml_status': latest_reading.get('ml_status'),
+                'ml_alerts': latest_reading.get('ml_alerts'),
+                'ml_confidence': latest_reading.get('ml_confidence')
             }
             
             # Upsert (insert or update if exists)

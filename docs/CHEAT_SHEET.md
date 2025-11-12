@@ -727,3 +727,8 @@ _Last Updated: November 10, 2025_
 _System Status: ✅ Production Ready_
 
 ---
+
+
+nmcli device status
+sudo nmcli device wifi connect "ZTEMU5002AD" password "AdrianGalvez_2025"
+sudo nmcli device wifi connect "jologs" password "watermelon#12"

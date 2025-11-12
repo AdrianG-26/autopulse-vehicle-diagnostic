@@ -6,7 +6,7 @@
     "1": "ADVISORY",
     "3": "CRITICAL"
   },
-  "training_date": "2025-11-08T22:04:39.234837",
+  "training_date": "2025-11-12T23:30:06.869865",
   "total_samples": 8125,
   "training_samples": 6500,
   "testing_samples": 1625,
