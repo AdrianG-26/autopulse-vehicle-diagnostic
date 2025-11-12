@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "build",
-  "installCommand": "npm install"
+  "buildCommand": "cd website && npm run build",
+  "outputDirectory": "website/build",
+  "installCommand": "cd website && npm install",
+  "framework": null
 }
-
