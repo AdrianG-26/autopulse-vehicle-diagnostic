@@ -34,7 +34,7 @@ def train_model():
     print("🤖 TRAINING RANDOM FOREST MODEL - 4-CLASS CLASSIFICATION")
     print("="*80)
     
-    clean_file = os.path.join(DATA_DIR, 'clean_training_data_3class.csv')
+    clean_file = os.path.join(DATA_DIR, 'clean_training_data.csv')
     if not os.path.exists(clean_file):
         print(f"\n❌ ERROR: Run python3 src/ml/fetch_training_data.py first"); return
     
