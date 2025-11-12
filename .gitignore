@@ -94,7 +94,6 @@ temp/
 
 # Vercel
 .vercel
-*.vercel.json
 
 # Build outputs
 website/build/
