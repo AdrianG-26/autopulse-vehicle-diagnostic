@@ -1,20 +1,20 @@
 # Ignore mobile app - we only deploy the website to Vercel
 mobile-app/
 
-# Ignore Python backend
-src/
-scripts/
+# Ignore Python backend (in root src/, not website/src/)
+/src/
+/scripts/
 *.py
 
-# Ignore other non-website directories
-archive/
-data/
-docs/
-models/
-systemd/
-udev/
+# Ignore other non-website directories  
+/archive/
+/data/
+/docs/
+/models/
+/systemd/
+/udev/
 
-# Ignore config files
-.env
+# Ignore config files in root
+/.env
 *.db
 *.sqlite
