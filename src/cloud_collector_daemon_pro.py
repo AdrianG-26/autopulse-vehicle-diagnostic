@@ -64,6 +64,7 @@ class ProfessionalCloudCollector:
         self.ml_storage = None
         self.batch_counter = 0  # Track batches for ML prediction timing
         self.ml_prediction_interval = 3  # Run ML every 3rd batch
+        self.last_ml_fields = None  # Cache last ML prediction to fill gaps between predictions
         
         self.running = Event()
         
@@ -578,48 +579,57 @@ class ProfessionalCloudCollector:
             self.batch_counter += 1
             should_run_ml = (self.batch_counter % self.ml_prediction_interval == 0)
             
-            # DEBUG: Check first record
-            if batch_data:
-                first = batch_data[0]
-                logger.info(f"DEBUG UPLOAD: First record has {len(first)} fields")
-                logger.info(f"DEBUG UPLOAD: timing_advance={first.get('timing_advance')}, run_time={first.get('run_time')}, control_module_voltage={first.get('control_module_voltage')}")
-            
-
-            # 🔧 FIX: Run ML prediction BEFORE database upload so fields are attached
-                if should_run_ml and self.ml_predictor and self.ml_predictor.is_loaded and self.ml_storage:
-                    try:
-                        # Use latest reading for prediction
-                        latest_reading = batch_data[-1]
-                        prediction = self.ml_predictor.predict(latest_reading)
+            # 🔧 Run ML prediction every Nth batch and cache the result
+            if should_run_ml and self.ml_predictor and self.ml_predictor.is_loaded and self.ml_storage:
+                try:
+                    # Use latest reading for prediction
+                    latest_reading = batch_data[-1]
+                    prediction = self.ml_predictor.predict(latest_reading)
+                    
+                    if prediction:
+                        # Extract ML fields for database storage
+                        ml_fields = extract_ml_fields_from_prediction(prediction)
                         
-                        if prediction:
-                            # Extract ML fields for database storage
-                            ml_fields = extract_ml_fields_from_prediction(prediction)
-                            
-                            # Attach ML fields to ALL readings in this batch BEFORE upload
-                            for reading in batch_data:
-                                reading.update(ml_fields)
-                            
-                            # Store prediction to ml_predictions table (for history)
-                            sensor_data_id = None
-                            ml_success = self.ml_storage.store_prediction(
-                                self.current_vehicle_id, 
-                                sensor_data_id, 
-                                prediction
-                            )
-                            
-                            if ml_success:
-                                logger.info(f"🤖 ML Prediction: {prediction['predicted_status']} "
-                                          f"(score: {ml_fields['ml_health_score']}/100, "
-                                          f"confidence: {prediction['confidence_score']}%)")
-                    except Exception as e:
-                        logger.error(f"❌ ML prediction error: {e}")
-
-
+                        # Cache these ML fields for subsequent batches
+                        self.last_ml_fields = ml_fields
+                        
+                        # Store prediction to ml_predictions table (for history)
+                        sensor_data_id = None
+                        ml_success = self.ml_storage.store_prediction(
+                            self.current_vehicle_id, 
+                            sensor_data_id, 
+                            prediction
+                        )
+                        
+                        if ml_success:
+                            logger.info(f"🤖 ML Prediction: {prediction['predicted_status']} "
+                                      f"(score: {ml_fields['ml_health_score']}/100, "
+                                      f"confidence: {prediction['confidence_score']}%)")
+                except Exception as e:
+                    logger.error(f"❌ ML prediction error: {e}")
+            
+            # 🔧 Apply ML fields to ALL readings (either fresh prediction or cached values)
+            # This ensures NO NULL values in the database for ml_* columns
+            if self.last_ml_fields:
+                for reading in batch_data:
+                    reading.update(self.last_ml_fields)
+                logger.debug(f"   Applied ML fields to batch (status: {self.last_ml_fields.get('ml_status')})")
+            else:
+                # No ML prediction yet (first few batches), use default values
+                default_ml = {
+                    'ml_health_score': None,
+                    'ml_status': None,
+                    'ml_confidence': None,
+                    'ml_alerts': None
+                }
+                for reading in batch_data:
+                    reading.update(default_ml)
+            
             # Store to sensor_data table (NOW with ML fields attached)
             success = supabase_storage.store_sensor_data_batch(
                 self.current_vehicle_id, batch_data
             )
+            
             if success:
                 self.session_stats['stored_records'] += len(batch_data)
                 logger.info(f"💾 Batch stored: {len(batch_data)}/{len(batch_data)} records (Total: {self.session_stats['stored_records']})")

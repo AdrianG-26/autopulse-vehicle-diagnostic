@@ -17,7 +17,7 @@
       }
     },
     "android": {
-      "package": "com.adriang26.autopulse",
+      "package": "com.adriang26.autopulse_development",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
