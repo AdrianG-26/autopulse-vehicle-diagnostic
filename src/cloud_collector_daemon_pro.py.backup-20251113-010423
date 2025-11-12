@@ -584,8 +584,16 @@ class ProfessionalCloudCollector:
                 logger.info(f"DEBUG UPLOAD: First record has {len(first)} fields")
                 logger.info(f"DEBUG UPLOAD: timing_advance={first.get('timing_advance')}, run_time={first.get('run_time')}, control_module_voltage={first.get('control_module_voltage')}")
             
+            # Store to sensor_data table
+            success = supabase_storage.store_sensor_data_batch(
+                self.current_vehicle_id, batch_data
+            )
+            
+            if success:
+                self.session_stats['stored_records'] += len(batch_data)
+                logger.info(f"💾 Batch stored: {len(batch_data)}/{len(batch_data)} records (Total: {self.session_stats['stored_records']})")
 
-            # 🔧 FIX: Run ML prediction BEFORE database upload so fields are attached
+                # Run ML prediction every Nth batch
                 if should_run_ml and self.ml_predictor and self.ml_predictor.is_loaded and self.ml_storage:
                     try:
                         # Use latest reading for prediction
@@ -596,7 +604,7 @@ class ProfessionalCloudCollector:
                             # Extract ML fields for database storage
                             ml_fields = extract_ml_fields_from_prediction(prediction)
                             
-                            # Attach ML fields to ALL readings in this batch BEFORE upload
+                            # Attach ML fields to ALL readings in this batch
                             for reading in batch_data:
                                 reading.update(ml_fields)
                             
@@ -615,14 +623,6 @@ class ProfessionalCloudCollector:
                     except Exception as e:
                         logger.error(f"❌ ML prediction error: {e}")
 
-
-            # Store to sensor_data table (NOW with ML fields attached)
-            success = supabase_storage.store_sensor_data_batch(
-                self.current_vehicle_id, batch_data
-            )
-            if success:
-                self.session_stats['stored_records'] += len(batch_data)
-                logger.info(f"💾 Batch stored: {len(batch_data)}/{len(batch_data)} records (Total: {self.session_stats['stored_records']})")
                 self.data_buffer.clear()
             else:
                 logger.warning("⚠️ Failed to upload batch to cloud")

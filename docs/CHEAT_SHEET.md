@@ -732,3 +732,4 @@ _System Status: ✅ Production Ready_
 nmcli device status
 sudo nmcli device wifi connect "ZTEMU5002AD" password "AdrianGalvez_2025"
 sudo nmcli device wifi connect "jologs" password "watermelon#12"
+sudo nmcli device wifi connect "WIFI NI BRIAN" password "Brianronnie2019!"
