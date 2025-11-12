@@ -122,8 +122,8 @@ class ProfessionalCloudCollector:
         """Connect to OBD-II adapter with retries"""
         logger.info("🔌 Connecting to OBD-II adapter...")
         
-        # Try USB/Bluetooth ports (USB first for stability)
-        ports = ['/dev/rfcomm0', '/dev/ttyACM0', '/dev/ttyUSB0', '/dev/ttyUSB1']  # Bluetooth first, then USB
+        # Try USB ports first (more stable), then fall back to Bluetooth
+        ports = ['/dev/ttyACM0', '/dev/ttyUSB0', '/dev/ttyUSB1', '/dev/rfcomm0']  # USB first, Bluetooth fallback
         
         for attempt in range(1, max_attempts + 1):
             for port in ports:
