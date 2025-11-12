@@ -91,6 +91,22 @@ export default function EngineScreen() {
           </View>
           <View style={styles.metricRow}>
             <MetricTile
+              iconName="speedometer"
+              iconBg="#F3E8FF"
+              iconColor="#8b5cf6"
+              label="Absolute Load"
+              value={`${fmt(data?.absolute_load, 1)}%`}
+            />
+            <MetricTile
+              iconName="pulse"
+              iconBg="#FEF3C7"
+              iconColor="#f59e0b"
+              label="Distance w/ MIL"
+              value={`${fmt(data?.distance_w_mil, 0)} km`}
+            />
+          </View>
+          <View style={styles.metricRow}>
+            <MetricTile
               iconName="thermometer-outline"
               iconBg="#FFF4DD"
               iconColor="#f1c40f"

@@ -99,6 +99,10 @@ export default function Engine({ onNavigate }) {
                 <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.engineLoad, 1)}%</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
+                <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Absolute Load</span>
+                <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.absoluteLoad, 1)}%</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: "0.75rem", borderBottom: "1px solid #e5e7eb" }}>
                 <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Coolant Temperature</span>
                 <span style={{ fontSize: "1.5rem", fontWeight: "600", color: "#111827" }}>{fmt(sensorData?.coolantTemp, 1)}°C</span>
               </div>

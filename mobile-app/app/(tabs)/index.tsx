@@ -141,6 +141,20 @@ export default function HomeScreen() {
                 : "N/A"}
             </ThemedText>
           </View>
+
+          <View style={styles.panelDivider} />
+
+          <View style={styles.panelRow}>
+            <View style={styles.panelRowLeft}>
+              <Ionicons name={data?.mil_status ? "warning" : "checkmark-circle-outline"} size={24} color={data?.mil_status ? "#ef4444" : "#10b981"} />
+              <ThemedText style={styles.panelRowLabel}>
+                Check Engine Light (MIL)
+              </ThemedText>
+            </View>
+            <ThemedText style={[styles.healthScore, { color: data?.mil_status ? "#ef4444" : "#10b981" }]}>
+              {data?.mil_status ? "🔴 ON" : "⚪ OFF"}
+            </ThemedText>
+          </View>
         </View>
       </View>
 

@@ -519,6 +519,73 @@ export default function Dashboard({ onNavigate }) {
                     </div>
                   </div>
                 </div>
+                <div
+                  style={{
+                    background: "#f9fafb",
+                    borderRadius: "12px",
+                    padding: "16px",
+                    border: "1px solid #e5e7eb",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.7rem",
+                      color: "#6b7280",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    🔴 Check Engine Light (MIL)
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "1.75rem",
+                      fontWeight: "700",
+                      color: sensorData?.milStatus ? "#ef4444" : "#10b981",
+                    }}
+                  >
+                    {sensorData?.milStatus ? "🔴 ON" : "⚪ OFF"}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    background: "#f9fafb",
+                    borderRadius: "12px",
+                    padding: "16px",
+                    border: "1px solid #e5e7eb",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "0.7rem",
+                      color: "#6b7280",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    🛣️ Distance w/ MIL
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "1.75rem",
+                      fontWeight: "700",
+                      color: "#f97316",
+                    }}
+                  >
+                    {fmt(sensorData?.distanceWithMil, 0)}
+                    <span
+                      style={{
+                        fontSize: "0.875rem",
+                        color: "#6b7280",
+                        marginLeft: "4px",
+                      }}
+                    >
+                      km
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div

@@ -260,6 +260,8 @@ class SensorDataService {
       fuelLevel: parseFloat(raw.fuel_level) || 0, // ✅ EXISTS in database!
       fuelTrimShort: parseFloat(raw.fuel_trim_short) || 0,
       fuelTrimLong: parseFloat(raw.fuel_trim_long) || 0,
+      fuelTrimShort2: parseFloat(raw.short_fuel_trim_2) || 0, // Bank 2
+      fuelTrimLong2: parseFloat(raw.long_fuel_trim_2) || 0, // Bank 2
       fuelPressure: parseFloat(raw.fuel_pressure) || 0, // ✅ EXISTS in database!
       // fuel_system_status: EXCLUDED - has null values
       // fuel_status: EXCLUDED - has null values
@@ -287,6 +289,8 @@ class SensorDataService {
 
       // Diagnostics
       dtcCount: parseInt(raw.dtc_count) || 0, // ✅ EXISTS in database!
+      milStatus: Boolean(raw.mil_status) || false, // Malfunction Indicator Lamp (Check Engine Light)
+      distanceWithMil: parseFloat(raw.distance_w_mil) || 0, // Distance traveled with MIL on (km)
       status: raw.status || "NORMAL",
       // fault_type: EXCLUDED - has null values
 

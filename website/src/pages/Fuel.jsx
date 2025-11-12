@@ -161,9 +161,66 @@ export default function Fuel({ onNavigate }) {
                 </div>
               </div>
               <div style={{ paddingTop: "0.5rem", borderTop: "1px solid #e5e7eb", marginTop: "0.5rem" }}>
-                <div style={{ color: "#6b7280", fontSize: "0.875rem", marginBottom: "0.25rem" }}>Combined Fuel Trim</div>
+                <div style={{ color: "#6b7280", fontSize: "0.875rem", marginBottom: "0.25rem" }}>Combined Fuel Trim (Bank 1)</div>
                 <div style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827" }}>
                   {fmt((sensorData?.fuelTrimShort || 0) + (sensorData?.fuelTrimLong || 0), 2)}%
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bank 2 Fuel Trim */}
+          <div style={{ backgroundColor: "white", borderRadius: "0.75rem", padding: "1.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827", marginBottom: "1rem" }}>
+              📊 Fuel Trim - Bank 2
+            </h3>
+            <div style={{ display: "grid", gap: "1rem" }}>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                  <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Short Term Fuel Trim (Bank 2)</span>
+                  <span style={{ fontSize: "1.5rem", fontWeight: "600", color: getFuelTrimStatus(sensorData?.fuelTrimShort2).color }}>
+                    {fmt(sensorData?.fuelTrimShort2, 2)}%
+                  </span>
+                </div>
+                <div style={{ height: "8px", backgroundColor: "#e5e7eb", borderRadius: "4px", overflow: "hidden" }}>
+                  <div 
+                    style={{ 
+                      height: "100%", 
+                      width: `${Math.min(Math.abs(sensorData?.fuelTrimShort2 || 0) * 2, 100)}%`, 
+                      backgroundColor: getFuelTrimStatus(sensorData?.fuelTrimShort2).color,
+                      transition: "width 0.3s ease"
+                    }}
+                  />
+                </div>
+                <div style={{ fontSize: "0.75rem", color: getFuelTrimStatus(sensorData?.fuelTrimShort2).color, marginTop: "0.25rem" }}>
+                  {getFuelTrimStatus(sensorData?.fuelTrimShort2).status}
+                </div>
+              </div>
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                  <span style={{ color: "#6b7280", fontSize: "0.875rem" }}>Long Term Fuel Trim (Bank 2)</span>
+                  <span style={{ fontSize: "1.5rem", fontWeight: "600", color: getFuelTrimStatus(sensorData?.fuelTrimLong2).color }}>
+                    {fmt(sensorData?.fuelTrimLong2, 2)}%
+                  </span>
+                </div>
+                <div style={{ height: "8px", backgroundColor: "#e5e7eb", borderRadius: "4px", overflow: "hidden" }}>
+                  <div 
+                    style={{ 
+                      height: "100%", 
+                      width: `${Math.min(Math.abs(sensorData?.fuelTrimLong2 || 0) * 2, 100)}%`, 
+                      backgroundColor: getFuelTrimStatus(sensorData?.fuelTrimLong2).color,
+                      transition: "width 0.3s ease"
+                    }}
+                  />
+                </div>
+                <div style={{ fontSize: "0.75rem", color: getFuelTrimStatus(sensorData?.fuelTrimLong2).color, marginTop: "0.25rem" }}>
+                  {getFuelTrimStatus(sensorData?.fuelTrimLong2).status}
+                </div>
+              </div>
+              <div style={{ paddingTop: "0.5rem", borderTop: "1px solid #e5e7eb", marginTop: "0.5rem" }}>
+                <div style={{ color: "#6b7280", fontSize: "0.875rem", marginBottom: "0.25rem" }}>Combined Fuel Trim (Bank 2)</div>
+                <div style={{ fontSize: "1.25rem", fontWeight: "600", color: "#111827" }}>
+                  {fmt((sensorData?.fuelTrimShort2 || 0) + (sensorData?.fuelTrimLong2 || 0), 2)}%
                 </div>
               </div>
             </div>
